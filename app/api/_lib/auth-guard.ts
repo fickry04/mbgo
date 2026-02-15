@@ -1,9 +1,8 @@
-import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 
-export default async function Home() {
+export async function requireApiSession() {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/login");
-  redirect("/dashboard");
+  if (!session) return null;
+  return session;
 }
