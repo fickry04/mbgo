@@ -45,8 +45,9 @@ export function RegisterClient() {
         return;
       }
 
-      router.push("/login?registered=1");
-      router.refresh();
+      // Hard navigation is more reliable in production to ensure the route changes
+      // even if client-side routing/hydration is in a bad state.
+      window.location.assign("/login?registered=1");
     } finally {
       setLoading(false);
     }
@@ -97,7 +98,10 @@ export function RegisterClient() {
                 <Button type="submit" loading={loading}>
                   Register
                 </Button>
-                <Button type="button" variant="subtle" onClick={() => router.push("/login")}
+                <Button
+                  type="button"
+                  variant="subtle"
+                  onClick={() => window.location.assign("/login")}
                 >
                   Back to Login
                 </Button>
