@@ -4,6 +4,9 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
+  // In production, you should always set NEXTAUTH_SECRET to a stable value.
+  // Without it, JWT sessions can fail across restarts/instances.
+  secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   providers: [
     CredentialsProvider({

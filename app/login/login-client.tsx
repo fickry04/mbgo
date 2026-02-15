@@ -57,8 +57,9 @@ export function LoginClient() {
         return;
       }
 
-      router.push(result.url ?? callbackUrl);
-      router.refresh();
+      // In production, a hard navigation is more reliable than client-side routing
+      // to ensure auth cookies are committed before hitting server-protected routes.
+      window.location.assign(result.url ?? callbackUrl);
     } finally {
       setLoading(false);
     }
