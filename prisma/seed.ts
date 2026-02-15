@@ -7,7 +7,7 @@ import {
   PropertyKind,
   TransactionDirection,
   TransactionKind,
-} from "@prisma/client";
+} from "@/app/generated/prisma/client";
 import bcrypt from "bcryptjs";
 import { readFileSync } from "node:fs";
 
