@@ -68,18 +68,13 @@ export async function POST(req: Request) {
   }
 
   const txResult = await prisma.$transaction(async (tx) => {
-    const fromCard = await tx.nfcCard.findUnique({ where: { uid: fromUid } });
-    if (!fromCard) throw new Error("FROM_CARD_NOT_FOUND");
-
-    const fromPlayer = await tx.player.findUnique({ where: { id: fromCard.playerId } });
+    const fromPlayer = await tx.player.findFirst({ where: { nfcCardUid: fromUid, gameId: gameId } });
     if (!fromPlayer || fromPlayer.gameId !== game.id) throw new Error("FROM_PLAYER_INVALID");
 
     let toPlayer: { id: string; balance: number } | null = null;
     if (direction === "TRANSFER") {
       if (!toUid) throw new Error("TO_UID_REQUIRED");
-      const toCard = await tx.nfcCard.findUnique({ where: { uid: toUid } });
-      if (!toCard) throw new Error("TO_CARD_NOT_FOUND");
-      const p = await tx.player.findUnique({ where: { id: toCard.playerId } });
+      const p = await tx.player.findFirst({ where: { nfcCardUid: toUid, gameId: gameId } });
       if (!p || p.gameId !== game.id) throw new Error("TO_PLAYER_INVALID");
       if (p.id === fromPlayer.id) throw new Error("SAME_PLAYER");
       toPlayer = { id: p.id, balance: p.balance };
