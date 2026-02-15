@@ -1,0 +1,251 @@
+// Prisma schema for Monopoly Bank (Next.js App Router)
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum GameStatus {
+  ACTIVE
+  ENDED
+}
+
+enum TransactionDirection {
+  CREDIT
+  DEBIT
+  TRANSFER
+}
+
+enum TransactionKind {
+  BALANCE_UPDATE
+  TRANSFER
+  BUY_PROPERTY
+  PAY_RENT
+  MORTGAGE_PROPERTY
+  COMMUNITY_CHEST
+  CHANCE
+  TAX
+}
+
+enum PropertyGroup {
+  BROWN
+  LIGHT_BLUE
+  PINK
+  ORANGE
+  RED
+  YELLOW
+  GREEN
+  DARK_BLUE
+}
+
+enum PropertyKind {
+  RESIDENTIAL
+  TRANSPORT
+  UTILITY
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Legacy (kept for smooth migration). Not used for login anymore.
+  username String? @unique
+
+  email         String?   @unique
+  emailVerified DateTime?
+  passwordHash  String
+
+  games Game[]
+
+  emailVerificationTokens EmailVerificationToken[]
+
+  // Optional, reserved for future: role, lastLoginAt, etc.
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  // Store only a hash of the token for safety.
+  tokenHash String @unique
+
+  email  String
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+}
+
+model Game {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownerUserId String? @db.Uuid
+  owner       User?   @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  status         GameStatus @default(ACTIVE)
+  playersCount   Int
+  initialBalance Int
+
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  players      Player[]
+  transactions Transaction[]
+
+  @@index([ownerUserId, status, createdAt])
+}
+
+model Player {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gameId String @db.Uuid
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  name    String
+  seat    Int
+  balance Int
+
+  nfcCard NfcCard?
+
+  outgoingTransactions Transaction[] @relation("FromPlayer")
+  incomingTransactions Transaction[] @relation("ToPlayer")
+
+  @@unique([gameId, seat])
+  @@index([gameId])
+}
+
+model NfcCard {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  uid String @unique
+
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId String @unique @db.Uuid
+
+  @@index([uid])
+}
+
+model TransactionType {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  code  TransactionKind @unique
+  label String
+
+  templates    TransactionTemplate[]
+  transactions Transaction[]
+}
+
+model PropertyTemplate {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name          String
+  // Monopoly-style grouping (used for card header color mapping)
+  propertyGroup PropertyGroup @default(BROWN)
+
+  // Determines how rent tiers should be interpreted in UI/templates
+  kind        PropertyKind @default(RESIDENTIAL)
+  // "KOMPLEK A" ... "KOMPLEK H"
+  propertySet String       @default("")
+  // e.g. Indonesia, Malaysia
+  country     String       @default("")
+  // e.g. Jakarta / landmark area
+  landmark    String       @default("")
+  // Optional icon key used by UI
+  icon        String?
+
+  // Prices (integer currency)
+  price         Int @default(0)
+  rentBase      Int @default(0)
+  rent1House    Int @default(0)
+  rent2Houses   Int @default(0)
+  rent3Houses   Int @default(0)
+  rent4Houses   Int @default(0)
+  rentHotel     Int @default(0)
+  housePrice    Int @default(0)
+  hotelPrice    Int @default(0)
+  mortgageValue Int @default(0)
+
+  // Sort order (roughly follows board progression)
+  boardIndex Int @default(0)
+
+  // Legacy field (kept for older data; do not use for UI mapping)
+  color String?
+
+  templates TransactionTemplate[]
+
+  @@unique([name])
+  @@index([propertyGroup, propertySet, boardIndex])
+}
+
+model TransactionTemplate {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name          String               @unique
+  direction     TransactionDirection
+  defaultAmount Int?
+  description   String?
+
+  transactionTypeId String          @db.Uuid
+  transactionType   TransactionType @relation(fields: [transactionTypeId], references: [id], onDelete: Restrict)
+
+  propertyTemplateId String?           @db.Uuid
+  propertyTemplate   PropertyTemplate? @relation(fields: [propertyTemplateId], references: [id], onDelete: SetNull)
+
+  @@index([transactionTypeId])
+}
+
+model Transaction {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gameId String @db.Uuid
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  transactionTypeId String          @db.Uuid
+  transactionType   TransactionType @relation(fields: [transactionTypeId], references: [id], onDelete: Restrict)
+
+  direction TransactionDirection
+
+  // Ledger values (integer currency)
+  amount Int
+  note   String?
+
+  // For credit/debit, only fromPlayer is used (the subject).
+  // For transfer, fromPlayer and toPlayer are both used.
+  fromPlayerId String? @db.Uuid
+  fromPlayer   Player? @relation("FromPlayer", fields: [fromPlayerId], references: [id], onDelete: SetNull)
+
+  toPlayerId String? @db.Uuid
+  toPlayer   Player? @relation("ToPlayer", fields: [toPlayerId], references: [id], onDelete: SetNull)
+
+  // Snapshot balances to make audit simpler
+  fromBalanceBefore Int?
+  fromBalanceAfter  Int?
+  toBalanceBefore   Int?
+  toBalanceAfter    Int?
+
+  @@index([gameId, createdAt])
+  @@index([fromPlayerId])
+  @@index([toPlayerId])
+  @@index([transactionTypeId])
+}

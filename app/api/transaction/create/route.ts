@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/app/lib/prisma";
 import { requireApiSession } from "@/app/api/_lib/auth-guard";
-import { TransactionDirection, TransactionKind } from "@prisma/client";
+import { TransactionDirection, TransactionKind } from "@/app/generated/prisma/client";
 
 const BodySchema = z.object({
   gameId: z.string().uuid().optional(),
