@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --mbg-grid: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --mbg-dot: color-mix(in srgb, var(--foreground) 12%, transparent);
 }
 
 @theme inline {
@@ -22,5 +24,83 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Monopoly-ish board nuance (uses existing theme colors) */
+.mbg-board {
+  position: relative;
+  background-color: var(--background);
+  background-image:
+    radial-gradient(circle at 12px 12px, var(--mbg-dot) 1px, transparent 1px),
+    linear-gradient(var(--mbg-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--mbg-grid) 1px, transparent 1px);
+  background-size: 48px 48px, 64px 64px, 64px 64px;
+  background-position: 0 0, 0 0, 0 0;
+  background-repeat: repeat, repeat, repeat;
+  background-attachment: fixed, fixed, fixed;
+}
+
+.mbg-board::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/background.png");
+  background-size: 50% auto;
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.mbg-page {
+  animation: mbg-fade-up 180ms ease;
+}
+
+@keyframes mbg-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mbg-card {
+  transition: transform 160ms ease;
+}
+
+.mbg-card:hover {
+  transform: translateY(-2px);
+}
+
+.mbg-click {
+  transition: transform 120ms ease;
+}
+
+.mbg-click:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* Global action feedback (covers most actions without per-component wiring) */
+.mantine-Button-root,
+.mantine-ActionIcon-root,
+.mantine-NavLink-root {
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.mantine-Button-root:active,
+.mantine-ActionIcon-root:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.mantine-Card-root {
+  transition: transform 160ms ease;
+}
+
+.mantine-Card-root:hover {
+  transform: translateY(-2px);
 }

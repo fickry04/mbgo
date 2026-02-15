@@ -74,6 +74,7 @@ export function PropertyTemplatesGrid({
             color?: string;
           }) => (
             <Button
+              className="mbg-click"
               component={Link}
               href={id ? `/transactions?templateId=${id}` : "/transactions"}
               size="xs"

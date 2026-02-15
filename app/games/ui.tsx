@@ -13,9 +13,9 @@ import {
   Title,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { fetchJson } from "@/app/lib/http";
+import { notifyError, notifySuccess } from "@/app/lib/notify";
 
 type Game = {
   id: string;
@@ -31,12 +31,14 @@ export function GameActions({ games }: { games: Game[] }) {
   const qc = useQueryClient();
   const [playersCount, setPlayersCount] = useState<number | undefined>(2);
   const [initialBalance, setInitialBalance] = useState<number | undefined>(150000);
+  const [creating, setCreating] = useState(false);
 
   const active = games.find((g) => g.status === "ACTIVE") ?? null;
 
   async function createGame() {
     if (playersCount == null || initialBalance == null) return;
     try {
+      setCreating(true);
       await fetchJson("/api/game/create", {
         method: "POST",
         body: JSON.stringify({
@@ -44,11 +46,13 @@ export function GameActions({ games }: { games: Game[] }) {
           initialBalance,
         }),
       });
-      notifications.show({ color: "green", title: "OK", message: "Game dibuat." });
+      notifySuccess("OK", "Game dibuat.");
       await qc.invalidateQueries();
       location.reload();
     } catch (e) {
-      notifications.show({ color: "red", title: "Gagal", message: e instanceof Error ? e.message : "Gagal" });
+      notifyError("Gagal", e, "Gagal");
+    } finally {
+      setCreating(false);
     }
   }
 
@@ -68,15 +72,11 @@ export function GameActions({ games }: { games: Game[] }) {
             method: "POST",
             body: JSON.stringify({ gameId }),
           });
-          notifications.show({ color: "green", title: "OK", message: "Game dihapus." });
+          notifySuccess("OK", "Game dihapus.");
           await qc.invalidateQueries();
           location.reload();
         } catch (e) {
-          notifications.show({
-            color: "red",
-            title: "Gagal",
-            message: e instanceof Error ? e.message : "Gagal delete game",
-          });
+          notifyError("Gagal", e, "Gagal delete game");
         }
       },
     });
@@ -98,15 +98,11 @@ export function GameActions({ games }: { games: Game[] }) {
             method: "POST",
             body: JSON.stringify({ gameId }),
           });
-          notifications.show({ color: "green", title: "OK", message: "Game diakhiri." });
+          notifySuccess("OK", "Game diakhiri.");
           await qc.invalidateQueries();
           location.reload();
         } catch (e) {
-          notifications.show({
-            color: "red",
-            title: "Gagal",
-            message: e instanceof Error ? e.message : "Gagal end game",
-          });
+          notifyError("Gagal", e, "Gagal end game");
         }
       },
     });
@@ -119,7 +115,7 @@ export function GameActions({ games }: { games: Game[] }) {
         {active ? <Badge color="green">Active</Badge> : <Badge color="yellow">No active</Badge>}
       </Group>
 
-      <Card withBorder radius="md">
+      <Card withBorder radius="md" className="mbg-card">
         <Group align="flex-end" justify="space-between">
           <Stack gap={0}>
             <Text fw={600}>Create New Game</Text>
@@ -145,14 +141,14 @@ export function GameActions({ games }: { games: Game[] }) {
               }
               min={0}
             />
-            <Button onClick={createGame} disabled={!!active}>
+            <Button className="mbg-click" onClick={createGame} disabled={!!active} loading={creating}>
               Create
             </Button>
           </Group>
         </Group>
       </Card>
 
-      <Card withBorder radius="md">
+      <Card withBorder radius="md" className="mbg-card">
         <Text fw={600} mb="sm">
           History
         </Text>
@@ -178,6 +174,7 @@ export function GameActions({ games }: { games: Game[] }) {
                   <Group justify="flex-end">
                     {g.status === "ACTIVE" ? (
                       <Button
+                        className="mbg-click"
                         size="xs"
                         color="orange"
                         variant="light"
@@ -187,6 +184,7 @@ export function GameActions({ games }: { games: Game[] }) {
                       </Button>
                     ) : null}
                     <Button
+                      className="mbg-click"
                       size="xs"
                       color="red"
                       variant="light"

@@ -16,7 +16,6 @@ import {
   Title,
   Transition,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import type {
   PropertyTemplate,
   TransactionDirection,
@@ -27,6 +26,7 @@ import { NfcScanModal } from "@/app/components/NfcScanModal";
 import { PropertyTemplateCard } from "@/app/components/PropertyTemplateCard";
 import { fetchJson } from "@/app/lib/http";
 import type { PropertyTemplateCardData } from "@/app/lib/property-template";
+import { notifyError, notifySuccess, notifyWarning } from "@/app/lib/notify";
 
 type TemplateWithType = TransactionTemplate & {
   transactionType: TransactionType;
@@ -59,57 +59,105 @@ function toCardData(p: PropertyTemplate): PropertyTemplateCardData {
 export function TransactionClient({ templates }: { templates: TemplateWithType[] }) {
   const searchParams = useSearchParams();
 
-  const templateOptions = useMemo(
-    () =>
-      templates.map((t) => ({
-        value: t.id,
-        label: `${t.name}`,
-      })),
-    [templates]
+  const GENERAL_VALUE = "__general";
+
+  const templateById = useMemo(() => new Map(templates.map((t) => [t.id, t] as const)), [templates]);
+
+  const propertyList = useMemo(() => {
+    const map = new Map<string, PropertyTemplate>();
+    for (const t of templates) {
+      const p = t.propertyTemplate;
+      if (p) map.set(p.id, p);
+    }
+    return [...map.values()].sort((a, b) => {
+      const aIdx = a.boardIndex ?? 0;
+      const bIdx = b.boardIndex ?? 0;
+      if (aIdx !== bIdx) return aIdx - bIdx;
+      return a.name.localeCompare(b.name);
+    });
+  }, [templates]);
+
+  const propertyOptions = useMemo(
+    () => [
+      { value: GENERAL_VALUE, label: "Umum (tanpa properti)" },
+      ...propertyList.map((p) => ({ value: p.id, label: p.name })),
+    ],
+    [propertyList]
   );
+
+  function colorForTypeCode(typeCode: string) {
+    switch (typeCode) {
+      case "BUY_PROPERTY":
+        return "blue";
+      case "PAY_RENT":
+        return "orange";
+      case "MORTGAGE_PROPERTY":
+        return "grape";
+      case "TRANSFER":
+        return "green";
+      default:
+        return undefined;
+    }
+  }
 
   const initialTemplateIdFromUrl = searchParams.get("templateId");
-  const initialTemplateId =
-    initialTemplateIdFromUrl && templates.some((t) => t.id === initialTemplateIdFromUrl)
-      ? initialTemplateIdFromUrl
-      : templateOptions[0]?.value ?? null;
+  const initialTemplateFromUrl =
+    initialTemplateIdFromUrl && templateById.has(initialTemplateIdFromUrl)
+      ? (templateById.get(initialTemplateIdFromUrl) ?? null)
+      : null;
 
-  const [templateId, setTemplateId] = useState<string | null>(initialTemplateId);
-  const selected = useMemo(
-    () => templates.find((t) => t.id === templateId) ?? null,
-    [templates, templateId]
-  );
+  const initialPropertyId = initialTemplateFromUrl?.propertyTemplateId ?? GENERAL_VALUE;
+  const [propertyId, setPropertyId] = useState<string>(initialPropertyId);
 
-  const [amount, setAmount] = useState<number | undefined>(selected?.defaultAmount ?? 50);
+  const [templateId, setTemplateId] = useState<string | null>(initialTemplateFromUrl?.id ?? null);
+  const selected = useMemo(() => (templateId ? templateById.get(templateId) ?? null : null), [templateId, templateById]);
+
+  const selectedProperty = useMemo(() => {
+    if (propertyId === GENERAL_VALUE) return null;
+    return propertyList.find((p) => p.id === propertyId) ?? null;
+  }, [propertyId, propertyList]);
+
+  const txTemplatesForSelection = useMemo(() => {
+    if (propertyId === GENERAL_VALUE) return templates.filter((t) => !t.propertyTemplateId);
+    return templates.filter((t) => t.propertyTemplateId === propertyId);
+  }, [propertyId, templates]);
+
+  function templateByExactName(list: TemplateWithType[], name: string) {
+    return list.find((t) => t.name === name) ?? null;
+  }
+
+  const [amount, setAmount] = useState<number | undefined>(selected?.defaultAmount ?? undefined);
   const [note, setNote] = useState("");
 
   const [fromUid, setFromUid] = useState<string | null>(null);
   const [toUid, setToUid] = useState<string | null>(null);
   const [scanFromOpen, setScanFromOpen] = useState(false);
   const [scanToOpen, setScanToOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [success, setSuccess] = useState(false);
   const direction: TransactionDirection | null = selected?.direction ?? null;
 
   async function submit() {
     if (!templateId) {
-      notifications.show({ color: "red", title: "Template kosong", message: "Pilih template." });
+      notifyWarning("Template kosong", "Pilih transaksi.");
       return;
     }
     if (!fromUid) {
-      notifications.show({ color: "red", title: "Belum scan", message: "Scan kartu pemain sumber." });
+      notifyWarning("Belum scan", "Scan kartu pemain sumber.");
       return;
     }
     if (direction === "TRANSFER" && !toUid) {
-      notifications.show({ color: "red", title: "Belum scan", message: "Scan kartu pemain tujuan." });
+      notifyWarning("Belum scan", "Scan kartu pemain tujuan.");
       return;
     }
     if (amount == null || Number(amount) <= 0) {
-      notifications.show({ color: "red", title: "Nominal invalid", message: "Isi nominal." });
+      notifyWarning("Nominal invalid", "Isi nominal.");
       return;
     }
 
     try {
+      setSubmitting(true);
       await fetchJson("/api/transaction/create", {
         method: "POST",
         body: JSON.stringify({
@@ -123,17 +171,15 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 1200);
-      notifications.show({ color: "green", title: "Sukses", message: "Transaksi tersimpan." });
+      notifySuccess("Sukses", "Transaksi tersimpan.");
 
       setFromUid(null);
       setToUid(null);
       setNote("");
     } catch (e) {
-      notifications.show({
-        color: "red",
-        title: "Gagal",
-        message: e instanceof Error ? e.message : "Gagal membuat transaksi",
-      });
+      notifyError("Gagal", e, "Gagal membuat transaksi");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -152,20 +198,167 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
 
       <Grid>
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card withBorder radius="md">
+          <Stack gap="xs">
+            <Stack gap={2}>
+              <Text size="sm" c="dimmed">
+                {selected
+                  ? `${selected.transactionType.label} • ${selected.direction}`
+                  : "Klik tombol untuk pilih transaksi"}
+              </Text>
+              <Text size="sm">{selected?.description ?? "-"}</Text>
+            </Stack>
+
+            {selectedProperty ? (
+              <PropertyTemplateCard
+                tpl={toCardData(selectedProperty)}
+                actions={
+                  (() => {
+                    const name = selectedProperty.name;
+
+                    const buyTpl = templateByExactName(txTemplatesForSelection, `Beli Properti — ${name}`);
+
+                    const rentBaseTpl =
+                      selectedProperty.kind === "UTILITY"
+                        ? templateByExactName(txTemplatesForSelection, `Bayar Utilitas (1 util) — ${name}`)
+                        : selectedProperty.kind === "TRANSPORT"
+                          ? templateByExactName(txTemplatesForSelection, `Bayar Sewa (1 transport) — ${name}`)
+                          : templateByExactName(txTemplatesForSelection, `Bayar Sewa (dasar) — ${name}`);
+
+                    const rent1Tpl =
+                      selectedProperty.kind === "UTILITY"
+                        ? templateByExactName(txTemplatesForSelection, `Bayar Utilitas (2 util) — ${name}`)
+                        : selectedProperty.kind === "TRANSPORT"
+                          ? templateByExactName(txTemplatesForSelection, `Bayar Sewa (2 transport) — ${name}`)
+                          : templateByExactName(txTemplatesForSelection, `Bayar Sewa (1 rumah) — ${name}`);
+
+                    const rent2Tpl =
+                      selectedProperty.kind === "TRANSPORT"
+                        ? templateByExactName(txTemplatesForSelection, `Bayar Sewa (3 transport) — ${name}`)
+                        : templateByExactName(txTemplatesForSelection, `Bayar Sewa (2 rumah) — ${name}`);
+
+                    const rent3Tpl =
+                      selectedProperty.kind === "TRANSPORT"
+                        ? templateByExactName(txTemplatesForSelection, `Bayar Sewa (4 transport) — ${name}`)
+                        : templateByExactName(txTemplatesForSelection, `Bayar Sewa (3 rumah) — ${name}`);
+
+                    const rent4Tpl = templateByExactName(txTemplatesForSelection, `Bayar Sewa (4 rumah) — ${name}`);
+                    const rentHotelTpl = templateByExactName(txTemplatesForSelection, `Bayar Sewa (hotel) — ${name}`);
+
+                    const mortgageTpl = templateByExactName(txTemplatesForSelection, `Hipotik — ${name}`);
+                    const redeemTpl = templateByExactName(txTemplatesForSelection, `Tebus Hipotik — ${name}`);
+
+                    const Action = ({
+                      tpl,
+                      label,
+                      color,
+                    }: {
+                      tpl: TemplateWithType | null;
+                      label: string;
+                      color?: string;
+                    }) => (
+                      <Button
+                        className="mbg-click"
+                        size="xs"
+                        variant="light"
+                        color={color}
+                        disabled={!tpl}
+                        onClick={() => {
+                          if (!tpl) return;
+                          setTemplateId(tpl.id);
+                          if (tpl.defaultAmount) setAmount(tpl.defaultAmount);
+                        }}
+                      >
+                        {label}
+                      </Button>
+                    );
+
+                    return (
+                      <Stack gap={8}>
+                        <Text size="xs" c="dimmed">
+                          Mulai transaksi Cepat:
+                        </Text>
+                        <Group gap={6} wrap="wrap">
+                          <Action tpl={buyTpl} label="Beli" color="blue" />
+                          {selectedProperty.kind === "RESIDENTIAL" ? (
+                            <>
+                              <Action tpl={rentBaseTpl} label="Sewa tanah" color="orange" />
+                              <Action tpl={rent1Tpl} label="Sewa 1 rumah" color="orange" />
+                              <Action tpl={rent2Tpl} label="Sewa 2 rumah" color="orange" />
+                              <Action tpl={rent3Tpl} label="Sewa 3 rumah" color="orange" />
+                              <Action tpl={rent4Tpl} label="Sewa 4 rumah" color="orange" />
+                              <Action tpl={rentHotelTpl} label="Sewa hotel" color="orange" />
+                            </>
+                          ) : selectedProperty.kind === "TRANSPORT" ? (
+                            <>
+                              <Action tpl={rentBaseTpl} label="Sewa 1 transport" color="orange" />
+                              <Action tpl={rent1Tpl} label="Sewa 2 transport" color="orange" />
+                              <Action tpl={rent2Tpl} label="Sewa 3 transport" color="orange" />
+                              <Action tpl={rent3Tpl} label="Sewa 4 transport" color="orange" />
+                            </>
+                          ) : (
+                            <>
+                              <Action tpl={rentBaseTpl} label="Utilitas 1" color="orange" />
+                              <Action tpl={rent1Tpl} label="Utilitas 2" color="orange" />
+                            </>
+                          )}
+                          <Action tpl={mortgageTpl} label="Hipotik" color="grape" />
+                          <Action tpl={redeemTpl} label="Tebus hipotik" color="grape" />
+                        </Group>
+                      </Stack>
+                    );
+                  })()
+                }
+              />
+            ) : (
+              <Card withBorder radius="md" className="mbg-card">
+                <Stack gap="sm">
+                  <Text fw={600}>Umum</Text>
+                  <Text size="xs" c="dimmed">
+                    Mulai transaksi:
+                  </Text>
+                  <Group gap={6} wrap="wrap">
+                    {txTemplatesForSelection.map((t) => (
+                      <Button
+                        key={t.id}
+                        className="mbg-click"
+                        size="xs"
+                        variant="light"
+                        color={colorForTypeCode(t.transactionType.code)}
+                        onClick={() => {
+                          setTemplateId(t.id);
+                          if (t.defaultAmount) setAmount(t.defaultAmount);
+                        }}
+                      >
+                        {t.name}
+                      </Button>
+                    ))}
+                  </Group>
+                </Stack>
+              </Card>
+            )}
+          </Stack>
+        </Grid.Col>
+
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <Card withBorder radius="md" className="mbg-card">
             <Stack gap="sm">
               <Select
-                label="Template transaksi"
-                data={templateOptions}
-                value={templateId}
+                label="Properti"
+                data={propertyOptions}
+                value={propertyId}
                 onChange={(v) => {
-                  setTemplateId(v);
-                  const next = templates.find((t) => t.id === v);
-                  if (next?.defaultAmount) setAmount(next.defaultAmount);
+                  const nextPropertyId = v ?? GENERAL_VALUE;
+                  setPropertyId(nextPropertyId);
+                  setTemplateId(null);
+                  setAmount(undefined);
                 }}
                 searchable
                 nothingFoundMessage="Tidak ada"
               />
+
+              <Text size="xs" c="dimmed">
+                Pilih cepat transaksi lewat kartu.
+              </Text>
 
               <NumberInput
                 label="Nominal"
@@ -178,7 +371,7 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
               <TextInput label="Catatan (opsional)" value={note} onChange={(e) => setNote(e.currentTarget.value)} />
 
               <Group justify="space-between" mt="xs">
-                <Button variant="light" onClick={() => setScanFromOpen(true)}>
+                <Button className="mbg-click" variant="light" onClick={() => setScanFromOpen(true)}>
                   Scan Sumber
                 </Button>
                 <Text size="sm" c="dimmed">
@@ -188,7 +381,12 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
 
               {direction === "TRANSFER" ? (
                 <Group justify="space-between">
-                  <Button variant="light" color="green" onClick={() => setScanToOpen(true)}>
+                  <Button
+                    className="mbg-click"
+                    variant="light"
+                    color="green"
+                    onClick={() => setScanToOpen(true)}
+                  >
                     Scan Tujuan
                   </Button>
                   <Text size="sm" c="dimmed">
@@ -198,30 +396,14 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
               ) : null}
 
               <Group justify="flex-end" mt="sm">
-                <Button onClick={submit}>Submit</Button>
+                <Button className="mbg-click" onClick={submit} loading={submitting}>
+                  Submit
+                </Button>
               </Group>
 
               <Text size="xs" c="dimmed">
                 Tip: Web NFC bekerja di Chrome Android.
               </Text>
-            </Stack>
-          </Card>
-        </Grid.Col>
-
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card withBorder radius="md">
-            <Stack gap="xs">
-              <Text fw={600}>Info template</Text>
-              <Text size="sm" c="dimmed">
-                {selected
-                  ? `${selected.transactionType.label} • ${selected.direction}`
-                  : "Pilih template"}
-              </Text>
-              <Text size="sm">{selected?.description ?? "-"}</Text>
-
-              {selected?.propertyTemplate ? (
-                <PropertyTemplateCard tpl={toCardData(selected.propertyTemplate)} />
-              ) : null}
             </Stack>
           </Card>
         </Grid.Col>

@@ -67,69 +67,85 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing amount" }, { status: 400 });
   }
 
-  const txResult = await prisma.$transaction(async (tx) => {
-    const fromPlayer = await tx.player.findFirst({ where: { nfcCardUid: fromUid, gameId: gameId } });
-    if (!fromPlayer || fromPlayer.gameId !== game.id) throw new Error("FROM_PLAYER_INVALID");
+  try {
+    const txResult = await prisma.$transaction(async (tx) => {
+      const fromPlayer = await tx.player.findFirst({
+        where: { nfcCardUid: fromUid, gameId: game.id },
+      });
+      if (!fromPlayer) throw new Error("FROM_PLAYER_INVALID");
 
-    let toPlayer: { id: string; balance: number } | null = null;
-    if (direction === "TRANSFER") {
-      if (!toUid) throw new Error("TO_UID_REQUIRED");
-      const p = await tx.player.findFirst({ where: { nfcCardUid: toUid, gameId: gameId } });
-      if (!p || p.gameId !== game.id) throw new Error("TO_PLAYER_INVALID");
-      if (p.id === fromPlayer.id) throw new Error("SAME_PLAYER");
-      toPlayer = { id: p.id, balance: p.balance };
-    }
+      let toPlayer: { id: string; balance: number } | null = null;
+      if (direction === "TRANSFER") {
+        if (!toUid) throw new Error("TO_UID_REQUIRED");
+        const p = await tx.player.findFirst({ where: { nfcCardUid: toUid, gameId: game.id } });
+        if (!p) throw new Error("TO_PLAYER_INVALID");
+        if (p.id === fromPlayer.id) throw new Error("SAME_PLAYER");
+        toPlayer = { id: p.id, balance: p.balance };
+      }
 
-    const fromBefore = fromPlayer.balance;
-    const toBefore = toPlayer?.balance ?? null;
+      const fromBefore = fromPlayer.balance;
+      const toBefore = toPlayer?.balance ?? null;
 
-    let fromAfter = fromBefore;
-    let toAfter = toBefore;
+      let fromAfter = fromBefore;
+      let toAfter = toBefore;
 
-    if (direction === "CREDIT") {
-      fromAfter = fromBefore + amount;
-      await tx.player.update({ where: { id: fromPlayer.id }, data: { balance: fromAfter } });
-    } else if (direction === "DEBIT") {
-      fromAfter = fromBefore - amount;
-      await tx.player.update({ where: { id: fromPlayer.id }, data: { balance: fromAfter } });
-    } else {
-      if (!toPlayer || toBefore === null) throw new Error("TO_UID_REQUIRED");
-      fromAfter = fromBefore - amount;
-      toAfter = toBefore + amount;
-      await tx.player.update({ where: { id: fromPlayer.id }, data: { balance: fromAfter } });
-      await tx.player.update({ where: { id: toPlayer.id }, data: { balance: toAfter } });
-    }
+      if (direction === "CREDIT") {
+        fromAfter = fromBefore + amount;
+        await tx.player.update({ where: { id: fromPlayer.id }, data: { balance: fromAfter } });
+      } else if (direction === "DEBIT") {
+        fromAfter = fromBefore - amount;
+        await tx.player.update({ where: { id: fromPlayer.id }, data: { balance: fromAfter } });
+      } else {
+        if (!toPlayer || toBefore === null) throw new Error("TO_UID_REQUIRED");
+        fromAfter = fromBefore - amount;
+        toAfter = toBefore + amount;
+        await tx.player.update({ where: { id: fromPlayer.id }, data: { balance: fromAfter } });
+        await tx.player.update({ where: { id: toPlayer.id }, data: { balance: toAfter } });
+      }
 
-    const ledger = await tx.transaction.create({
-      data: {
-        gameId: game.id,
-        transactionTypeId: transactionType.id,
-        direction,
-        amount,
-        note,
-        fromPlayerId: fromPlayer.id,
-        toPlayerId: toPlayer?.id ?? null,
-        fromBalanceBefore: fromBefore,
-        fromBalanceAfter: fromAfter,
-        toBalanceBefore: toBefore,
-        toBalanceAfter: toAfter,
-      },
+      const ledger = await tx.transaction.create({
+        data: {
+          gameId: game.id,
+          transactionTypeId: transactionType.id,
+          direction,
+          amount,
+          note,
+          fromPlayerId: fromPlayer.id,
+          toPlayerId: toPlayer?.id ?? null,
+          fromBalanceBefore: fromBefore,
+          fromBalanceAfter: fromAfter,
+          toBalanceBefore: toBefore,
+          toBalanceAfter: toAfter,
+        },
+      });
+
+      return {
+        transaction: ledger,
+        from: { id: fromPlayer.id, balanceBefore: fromBefore, balanceAfter: fromAfter },
+        to: toPlayer
+          ? { id: toPlayer.id, balanceBefore: toBefore, balanceAfter: toAfter }
+          : null,
+      };
     });
 
-    return {
-      transaction: ledger,
-      from: { id: fromPlayer.id, balanceBefore: fromBefore, balanceAfter: fromAfter },
-      to: toPlayer
-        ? { id: toPlayer.id, balanceBefore: toBefore, balanceAfter: toAfter }
-        : null,
-    };
-  });
+    return NextResponse.json({
+      game,
+      transactionType,
+      direction,
+      amount,
+      result: txResult,
+    });
+  } catch (e) {
+    const code = e instanceof Error ? e.message : "";
+    if (
+      code === "FROM_PLAYER_INVALID" ||
+      code === "TO_UID_REQUIRED" ||
+      code === "TO_PLAYER_INVALID" ||
+      code === "SAME_PLAYER"
+    ) {
+      return NextResponse.json({ error: code }, { status: 400 });
+    }
 
-  return NextResponse.json({
-    game,
-    transactionType,
-    direction,
-    amount,
-    result: txResult,
-  });
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
 }

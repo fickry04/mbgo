@@ -39,37 +39,51 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Seat exceeds playersCount" }, { status: 400 });
   }
 
-  const result = await prisma.$transaction(async (tx) => {
-    const existingSeat = await tx.player.findFirst({
-      where: { 
-        gameId: game.id,
-        seat: seat
-      },
-      select: { id: true }
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const existingSeat = await tx.player.findFirst({
+        where: {
+          gameId: game.id,
+          seat: seat,
+        },
+        select: { id: true },
+      });
+      if (existingSeat) throw new Error("SEAT_TAKEN");
+
+      const existingUid = await tx.player.findUnique({
+        where: {
+          gameId_nfcCardUid: {
+            gameId: game.id,
+            nfcCardUid: nfcUid,
+          },
+        },
+        select: { id: true },
+      });
+      if (existingUid) throw new Error("UID_TAKEN");
+
+      const player = await tx.player.create({
+        data: {
+          gameId: game.id,
+          name,
+          seat,
+          balance: game.initialBalance,
+          nfcCardUid: nfcUid,
+        },
+      });
+
+      return player;
     });
-    if (existingSeat) throw new Error("SEAT_TAKEN");
 
-    const existingUid = await tx.player.findUnique({
-      where: { 
-        id: game.id,
-        nfcCardUid: nfcUid
-      },
-      select: { id: true },
-    });
-    if (existingUid) throw new Error("UID_TAKEN");
+    return NextResponse.json({ player: result, game });
+  } catch (e) {
+    const code = e instanceof Error ? e.message : "";
+    if (code === "SEAT_TAKEN") {
+      return NextResponse.json({ error: "SEAT_TAKEN" }, { status: 409 });
+    }
+    if (code === "UID_TAKEN") {
+      return NextResponse.json({ error: "UID_TAKEN" }, { status: 409 });
+    }
 
-    const player = await tx.player.create({
-      data: {
-        gameId: game.id,
-        name,
-        seat,
-        balance: game.initialBalance,
-        nfcCardUid: nfcUid
-      }
-    });
-
-    return player;
-  });
-
-  return NextResponse.json({ player: result, game });
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
 }

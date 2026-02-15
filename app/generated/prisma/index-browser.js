@@ -139,6 +139,15 @@ exports.Prisma.EmailVerificationTokenScalarFieldEnum = {
   userId: 'userId'
 };
 
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  tokenHash: 'tokenHash',
+  email: 'email',
+  userId: 'userId'
+};
+
 exports.Prisma.GameScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -280,6 +289,7 @@ exports.TransactionDirection = exports.$Enums.TransactionDirection = {
 exports.Prisma.ModelName = {
   User: 'User',
   EmailVerificationToken: 'EmailVerificationToken',
+  PasswordResetToken: 'PasswordResetToken',
   Game: 'Game',
   Player: 'Player',
   TransactionType: 'TransactionType',

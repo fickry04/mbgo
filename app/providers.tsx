@@ -24,7 +24,31 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <MantineProvider
         defaultColorScheme="light"
         theme={{
-          primaryColor: "red",
+          primaryColor: "teal",
+          defaultRadius: "md",
+          components: {
+            Button: {
+              styles: {
+                root: {
+                  transition: "transform 120ms ease, filter 120ms ease",
+                },
+              },
+            },
+            Card: {
+              styles: {
+                root: {
+                  transition: "transform 160ms ease",
+                },
+              },
+            },
+            NavLink: {
+              styles: {
+                root: {
+                  transition: "transform 140ms ease",
+                },
+              },
+            },
+          },
         }}
       >
         <ModalsProvider>

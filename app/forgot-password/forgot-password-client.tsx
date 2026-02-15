@@ -7,39 +7,41 @@ import {
   Card,
   Container,
   Group,
-  PasswordInput,
   Stack,
   Text,
   TextInput,
   Title,
 } from "@mantine/core";
-import { fetchJson } from "@/app/lib/http";
-import { notifyError } from "@/app/lib/notify";
-import Image from "next/image";
-import logo from '@/public/logo.png';
 
-export function RegisterClient() {
+import { fetchJson } from "@/app/lib/http";
+import { notifyError, notifySuccess } from "@/app/lib/notify";
+import Image from "next/image";
+import logo from "@/public/logo.png";
+
+export function ForgotPasswordClient() {
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      await fetchJson("/api/auth/register", {
+      await fetchJson("/api/auth/reset-password/request", {
         method: "POST",
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ email }),
       });
 
-      // Hard navigation is more reliable in production to ensure the route changes
-      // even if client-side routing/hydration is in a bad state.
-      window.location.assign("/login?registered=1");
-    } catch (e) {
-      notifyError("Register gagal", e, "Terjadi kesalahan.");
+      notifySuccess(
+        "Cek email kamu",
+        "Jika email terdaftar, link reset password sudah dikirim."
+      );
+
+      // Optional: move user back to login
+      router.push("/login");
+    } catch (err) {
+      notifyError("Gagal mengirim email", err, "Terjadi kesalahan.");
     } finally {
       setLoading(false);
     }
@@ -59,19 +61,12 @@ export function RegisterClient() {
           style={{ display: "block", margin: "0 auto", maxWidth: "100%", height: "auto" }}
         />
         <Text c="dimmed" ta="center" size="sm">
-          Register User
+          Lupa Password
         </Text>
 
         <Card withBorder radius="md" p="lg" className="mbg-card">
           <form onSubmit={onSubmit}>
             <Stack gap="sm">
-              <TextInput
-                label="Username"
-                value={username}
-                onChange={(e) => setUsername(e.currentTarget.value)}
-                autoComplete="username"
-                required
-              />
               <TextInput
                 label="Email"
                 value={email}
@@ -79,16 +74,9 @@ export function RegisterClient() {
                 autoComplete="email"
                 required
               />
-              <PasswordInput
-                label="Password"
-                value={password}
-                onChange={(e) => setPassword(e.currentTarget.value)}
-                autoComplete="new-password"
-                required
-              />
               <Group justify="space-between" mt="xs">
                 <Button className="mbg-click" type="submit" loading={loading}>
-                  Register
+                  Kirim link reset
                 </Button>
                 <Button
                   className="mbg-click"

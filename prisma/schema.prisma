@@ -61,10 +61,28 @@ model User {
 
   emailVerificationTokens EmailVerificationToken[]
 
+  passwordResetTokens PasswordResetToken[]
+
   // Optional, reserved for future: role, lastLoginAt, etc.
 }
 
 model EmailVerificationToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  // Store only a hash of the token for safety.
+  tokenHash String @unique
+
+  email  String
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+}
+
+model PasswordResetToken {
   id        String   @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now())
   expiresAt DateTime

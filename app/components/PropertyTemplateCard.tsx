@@ -81,7 +81,7 @@ export function PropertyTemplateCard({
           ];
 
   return (
-    <Card withBorder radius="md" padding={0}>
+    <Card withBorder radius="md" padding={0} className="mbg-card">
       <Card.Section
         px="md"
         py="sm"
@@ -105,7 +105,7 @@ export function PropertyTemplateCard({
             </Stack>
           </Group>
           <Badge variant="white" color={meta.mantineColor}>
-            {tpl.propertySet} • {meta.label}
+            {tpl.propertySet}
           </Badge>
         </Group>
       </Card.Section>

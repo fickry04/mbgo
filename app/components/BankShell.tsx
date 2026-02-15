@@ -7,6 +7,7 @@ import {
   AppShell,
   Burger,
   Button,
+  Box,
   Flex,
   Group,
   NavLink,
@@ -25,6 +26,7 @@ import {
 } from "@tabler/icons-react";
 import Image from "next/image";
 import logo from '../../public/logo.png';
+import { notifyError } from "@/app/lib/notify";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: IconDashboard },
@@ -79,17 +81,22 @@ export function BankShell({
             w={smUp ? "auto" : "100%"}
             wrap="wrap"
           >
-            <Text size="sm" c="dimmed">
+            <Text size="sm" c="dimmed" style={{width:"100px" ,overflowX: "hidden"}}>
               {username ? `Admin: ${username}` : ""}
             </Text>
             <Button
+              className="mbg-click"
               variant="light"
               color="red"
               leftSection={<IconLogout size={16} />}
               onClick={async () => {
-                await signOut({ redirect: false });
-                router.push("/login");
-                router.refresh();
+                try {
+                  await signOut({ redirect: false });
+                  router.push("/login");
+                  router.refresh();
+                } catch (e) {
+                  notifyError("Logout gagal", e, "Tidak bisa logout. Coba lagi.");
+                }
               }}
             >
               Logout
@@ -118,7 +125,11 @@ export function BankShell({
         </ScrollArea>
       </AppShell.Navbar>
 
-      <AppShell.Main>{children}</AppShell.Main>
+      <AppShell.Main>
+        <Box key={pathname} className="mbg-page">
+          {children}
+        </Box>
+      </AppShell.Main>
     </AppShell>
   );
 }

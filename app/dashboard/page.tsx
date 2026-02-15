@@ -7,6 +7,7 @@ import {
   Card,
   Grid,
   Group,
+  Skeleton,
   Select,
   Stack,
   Table,
@@ -14,9 +15,9 @@ import {
   Title,
 } from "@mantine/core";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { notifications } from "@mantine/notifications";
 import { fetchJson } from "@/app/lib/http";
 import { formatMoney } from "@/app/lib/money";
+import { notifyError, notifySuccess } from "@/app/lib/notify";
 
 type SummaryResponse = {
   game: { id: string; status: "ACTIVE" | "ENDED"; playersCount: number; initialBalance: number } | null;
@@ -37,6 +38,8 @@ type SummaryResponse = {
 export default function DashboardPage() {
   const qc = useQueryClient();
   const [playerFilter, setPlayerFilter] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [ending, setEnding] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["summary", playerFilter],
@@ -56,45 +59,38 @@ export default function DashboardPage() {
 
   async function createGame() {
     try {
+      setCreating(true);
       const body = { playersCount: 4, initialBalance: 1500 };
       await fetchJson<{ game: { id: string } }>("/api/game/create", {
         method: "POST",
         body: JSON.stringify(body),
       });
-      notifications.show({
-        color: "green",
-        title: "Game dibuat",
-        message: "Game baru berhasil dibuat.",
-      });
+      notifySuccess("Game dibuat", "Game baru berhasil dibuat.");
       await qc.invalidateQueries({ queryKey: ["summary"] });
     } catch (e) {
-      notifications.show({
-        color: "red",
-        title: "Gagal",
-        message: e instanceof Error ? e.message : "Gagal create game",
-      });
+      notifyError("Gagal", e, "Gagal create game");
+    } finally {
+      setCreating(false);
     }
   }
 
   async function endGame() {
     if (!data?.game?.id) return;
     try {
+      setEnding(true);
       await fetchJson("/api/game/end", {
         method: "POST",
         body: JSON.stringify({ gameId: data.game.id }),
       });
-      notifications.show({
-        color: "green",
-        title: "Game diakhiri",
-        message: "Game aktif berhasil diakhiri. Kamu bisa membuat game baru.",
-      });
+      notifySuccess(
+        "Game diakhiri",
+        "Game aktif berhasil diakhiri. Kamu bisa membuat game baru."
+      );
       await qc.invalidateQueries({ queryKey: ["summary"] });
     } catch (e) {
-      notifications.show({
-        color: "red",
-        title: "Gagal",
-        message: e instanceof Error ? e.message : "Gagal end game",
-      });
+      notifyError("Gagal", e, "Gagal end game");
+    } finally {
+      setEnding(false);
     }
   }
 
@@ -111,11 +107,22 @@ export default function DashboardPage() {
         </Stack>
         <Group>
           {data?.game ? (
-            <Button color="orange" variant="light" onClick={endGame}>
+            <Button
+              className="mbg-click"
+              color="orange"
+              variant="light"
+              onClick={endGame}
+              loading={ending}
+            >
               End Game
             </Button>
           ) : null}
-          <Button onClick={createGame} disabled={!!data?.game}>
+          <Button
+            className="mbg-click"
+            onClick={createGame}
+            disabled={!!data?.game}
+            loading={creating}
+          >
             Create New Game
           </Button>
         </Group>
@@ -123,7 +130,7 @@ export default function DashboardPage() {
 
       <Grid>
         <Grid.Col span={{ base: 12, md: 5 }}>
-          <Card withBorder radius="md">
+          <Card withBorder radius="md" className="mbg-card">
             <Group justify="space-between" mb="sm">
               <Text fw={600}>Players</Text>
               <Badge color="green">Total: {players.length}</Badge>
@@ -137,13 +144,27 @@ export default function DashboardPage() {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {players.map((p) => (
-                  <Table.Tr key={p.id}>
-                    <Table.Td>P{p.seat}</Table.Td>
-                    <Table.Td>{p.name}</Table.Td>
-                    <Table.Td>{formatMoney(p.balance)}</Table.Td>
-                  </Table.Tr>
-                ))}
+                {isLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <Table.Tr key={`sk-${i}`}>
+                        <Table.Td>
+                          <Skeleton h={10} w={36} />
+                        </Table.Td>
+                        <Table.Td>
+                          <Skeleton h={10} w="70%" />
+                        </Table.Td>
+                        <Table.Td>
+                          <Skeleton h={10} w={90} />
+                        </Table.Td>
+                      </Table.Tr>
+                    ))
+                  : players.map((p) => (
+                      <Table.Tr key={p.id}>
+                        <Table.Td>P{p.seat}</Table.Td>
+                        <Table.Td>{p.name}</Table.Td>
+                        <Table.Td>{formatMoney(p.balance)}</Table.Td>
+                      </Table.Tr>
+                    ))}
               </Table.Tbody>
             </Table>
             <Group justify="space-between" mt="sm">
@@ -156,7 +177,7 @@ export default function DashboardPage() {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 7 }}>
-          <Card withBorder radius="md">
+          <Card withBorder radius="md" className="mbg-card">
             <Group justify="space-between" mb="sm">
               <Text fw={600}>Riwayat Transaksi</Text>
               <Select
@@ -179,14 +200,35 @@ export default function DashboardPage() {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {(data?.transactions ?? []).map((t) => (
-                  <Table.Tr key={t.id}>
-                    <Table.Td>{t.transactionType.label}</Table.Td>
-                    <Table.Td>{t.fromPlayer ? `P${t.fromPlayer.seat} ${t.fromPlayer.name}` : "-"}</Table.Td>
-                    <Table.Td>{t.toPlayer ? `P${t.toPlayer.seat} ${t.toPlayer.name}` : "-"}</Table.Td>
-                    <Table.Td>{formatMoney(t.amount)}</Table.Td>
-                  </Table.Tr>
-                ))}
+                {isLoading
+                  ? Array.from({ length: 6 }).map((_, i) => (
+                      <Table.Tr key={`tx-sk-${i}`}>
+                        <Table.Td>
+                          <Skeleton h={10} w="80%" />
+                        </Table.Td>
+                        <Table.Td>
+                          <Skeleton h={10} w="70%" />
+                        </Table.Td>
+                        <Table.Td>
+                          <Skeleton h={10} w="70%" />
+                        </Table.Td>
+                        <Table.Td>
+                          <Skeleton h={10} w={90} />
+                        </Table.Td>
+                      </Table.Tr>
+                    ))
+                  : (data?.transactions ?? []).map((t) => (
+                      <Table.Tr key={t.id}>
+                        <Table.Td>{t.transactionType.label}</Table.Td>
+                        <Table.Td>
+                          {t.fromPlayer ? `P${t.fromPlayer.seat} ${t.fromPlayer.name}` : "-"}
+                        </Table.Td>
+                        <Table.Td>
+                          {t.toPlayer ? `P${t.toPlayer.seat} ${t.toPlayer.name}` : "-"}
+                        </Table.Td>
+                        <Table.Td>{formatMoney(t.amount)}</Table.Td>
+                      </Table.Tr>
+                    ))}
                 {!isLoading && (data?.transactions?.length ?? 0) === 0 ? (
                   <Table.Tr>
                     <Table.Td colSpan={4}>

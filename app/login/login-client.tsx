@@ -14,7 +14,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
+import { notifyError, notifyWarning } from "@/app/lib/notify";
 import Image from "next/image";
 import logo from '../../public/logo.png';
 
@@ -24,6 +24,7 @@ export function LoginClient() {
   const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
   const verified = searchParams.get("verified");
   const registered = searchParams.get("registered");
+  const reset = searchParams.get("reset");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,18 +43,13 @@ export function LoginClient() {
 
       if (!result?.ok) {
         if (result?.error === "EmailNotVerified") {
-          notifications.show({
-            color: "yellow",
-            title: "Email belum diverifikasi",
-            message: "Silakan cek email untuk link verifikasi sebelum login.",
-          });
+          notifyWarning(
+            "Email belum diverifikasi",
+            "Silakan cek email untuk link verifikasi sebelum login."
+          );
           return;
         }
-        notifications.show({
-          color: "red",
-          title: "Login gagal",
-          message: "Email atau password salah.",
-        });
+        notifyError("Login gagal", "Email atau password salah.");
         return;
       }
 
@@ -69,6 +65,7 @@ export function LoginClient() {
         <Title order={2} ta="center">
           Monopoly Bank Go
         </Title>
+        <Text style={{textAlign: "center"}}>Digital bank untuk permainan Monopoly dengan kartu pemain NFC (NTAG215) menggunakan Web NFC.</Text>
         <Image
           src={logo}
           alt="logo"
@@ -92,7 +89,13 @@ export function LoginClient() {
           </Text>
         ) : null}
 
-        <Card withBorder radius="md" p="lg">
+        {reset === "1" ? (
+          <Text c="green" ta="center" size="sm">
+            Password berhasil direset. Silakan login.
+          </Text>
+        ) : null}
+
+        <Card withBorder radius="md" p="lg" className="mbg-card">
           <form onSubmit={onSubmit}>
             <Stack gap="sm">
               <TextInput
@@ -110,14 +113,27 @@ export function LoginClient() {
                 required
               />
               <Group justify="space-between" mt="xs">
-                <Button type="submit" loading={loading}>
+                <Button className="mbg-click" type="submit" loading={loading}>
                   Login
                 </Button>
-                <Button type="button" variant="subtle" onClick={() => router.push("/register")}
+                <Button
+                  className="mbg-click"
+                  type="button"
+                  variant="subtle"
+                  onClick={() => router.push("/register")}
                 >
                   Register
                 </Button>
               </Group>
+
+              <Button
+                className="mbg-click"
+                type="button"
+                variant="subtle"
+                onClick={() => router.push("/forgot-password")}
+              >
+                Lupa password?
+              </Button>
             </Stack>
           </form>
         </Card>

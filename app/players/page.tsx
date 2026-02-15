@@ -7,6 +7,7 @@ import {
   Grid,
   Group,
   NumberInput,
+  Skeleton,
   Stack,
   Table,
   Text,
@@ -14,10 +15,10 @@ import {
   Title,
 } from "@mantine/core";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { notifications } from "@mantine/notifications";
 import { NfcScanModal } from "@/app/components/NfcScanModal";
 import { fetchJson } from "@/app/lib/http";
 import { formatMoney } from "@/app/lib/money";
+import { notifyError, notifySuccess, notifyWarning } from "@/app/lib/notify";
 
 type SummaryResponse = {
   game: { id: string; status: "ACTIVE" | "ENDED"; playersCount: number; initialBalance: number } | null;
@@ -28,7 +29,7 @@ type SummaryResponse = {
 
 export default function PlayersPage() {
   const qc = useQueryClient();
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["summary"],
     queryFn: () => fetchJson<SummaryResponse>("/api/dashboard/summary"),
     refetchInterval: 1500,
@@ -42,6 +43,7 @@ export default function PlayersPage() {
   const [scanOpened, setScanOpened] = useState(false);
   const [pendingUid, setPendingUid] = useState<string | null>(null);
   const [deletingPlayerId, setDeletingPlayerId] = useState<string | null>(null);
+  const [registering, setRegistering] = useState(false);
 
   const seatMax = game?.playersCount ?? 4;
 
@@ -53,43 +55,42 @@ export default function PlayersPage() {
 
   async function registerPlayer(uid: string) {
     if (!game) {
-      notifications.show({ color: "red", title: "Tidak ada game", message: "Buat game dulu di Dashboard." });
+      notifyWarning("Tidak ada game", "Buat game dulu di Dashboard.");
       return;
     }
     if (!name.trim()) {
-      notifications.show({ color: "red", title: "Nama kosong", message: "Isi nama pemain." });
+      notifyWarning("Nama kosong", "Isi nama pemain.");
       return;
     }
     if (seat == null) {
-      notifications.show({ color: "red", title: "Seat kosong", message: "Pilih seat." });
+      notifyWarning("Seat kosong", "Pilih seat.");
       return;
     }
 
     try {
+      setRegistering(true);
       await fetchJson("/api/player/register", {
         method: "POST",
         body: JSON.stringify({ gameId: game.id, name, seat, nfcUid: uid }),
       });
-      notifications.show({ color: "green", title: "Berhasil", message: "Pemain terdaftar." });
+      notifySuccess("Berhasil", "Pemain terdaftar.");
       setName("");
       setSeat(1);
       await qc.invalidateQueries({ queryKey: ["summary"] });
     } catch (e) {
-      notifications.show({
-        color: "red",
-        title: "Gagal",
-        message: e instanceof Error ? e.message : "Gagal register player",
-      });
+      notifyError("Gagal", e, "Gagal register player");
+    } finally {
+      setRegistering(false);
     }
   }
 
   async function deletePlayer(playerId: string, playerName: string) {
     if (!game) {
-      notifications.show({ color: "red", title: "Tidak ada game", message: "Tidak ada game aktif." });
+      notifyWarning("Tidak ada game", "Tidak ada game aktif.");
       return;
     }
     if (game.status !== "ACTIVE") {
-      notifications.show({ color: "red", title: "Game selesai", message: "Tidak bisa hapus player." });
+      notifyWarning("Game selesai", "Tidak bisa hapus player.");
       return;
     }
 
@@ -102,14 +103,10 @@ export default function PlayersPage() {
         method: "POST",
         body: JSON.stringify({ playerId }),
       });
-      notifications.show({ color: "green", title: "Berhasil", message: "Pemain terhapus." });
+      notifySuccess("Berhasil", "Pemain terhapus.");
       await qc.invalidateQueries({ queryKey: ["summary"] });
     } catch (e) {
-      notifications.show({
-        color: "red",
-        title: "Gagal",
-        message: e instanceof Error ? e.message : "Gagal hapus player",
-      });
+      notifyError("Gagal", e, "Gagal hapus player");
     } finally {
       setDeletingPlayerId(null);
     }
@@ -128,7 +125,7 @@ export default function PlayersPage() {
 
       <Grid>
         <Grid.Col span={{ base: 12, md: 5 }}>
-          <Card withBorder radius="md">
+          <Card withBorder radius="md" className="mbg-card">
             <Stack gap="sm">
               <Text fw={600}>Tambah pemain</Text>
               <TextInput label="Nama" value={name} onChange={(e) => setName(e.currentTarget.value)} />
@@ -144,11 +141,13 @@ export default function PlayersPage() {
               </Text>
               <Group justify="flex-end">
                 <Button
+                  className="mbg-click"
                   onClick={() => {
                     setPendingUid(null);
                     setScanOpened(true);
                   }}
                   disabled={!game}
+                  loading={registering}
                 >
                   Scan NFC & Register
                 </Button>
@@ -158,7 +157,7 @@ export default function PlayersPage() {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 7 }}>
-          <Card withBorder radius="md">
+          <Card withBorder radius="md" className="mbg-card">
             <Text fw={600} mb="sm">
               Daftar pemain
             </Text>
@@ -174,28 +173,49 @@ export default function PlayersPage() {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {players.map((p) => (
-                  <Table.Tr key={p.id}>
-                    <Table.Td>P{p.seat}</Table.Td>
-                    <Table.Td>{p.name}</Table.Td>
-                    <Table.Td>{p.nfcCard?.uid ?? "-"}</Table.Td>
-                    <Table.Td>{formatMoney(p.balance)}</Table.Td>
-                    <Table.Td>
-                      <Button
-                        size="xs"
-                        color="red"
-                        variant="light"
-                        loading={deletingPlayerId === p.id}
-                        disabled={!game || game.status !== "ACTIVE"}
-                        onClick={() => {
-                          void deletePlayer(p.id, p.name);
-                        }}
-                      >
-                        Hapus
-                      </Button>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
+                {isLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <Table.Tr key={`p-sk-${i}`}>
+                        <Table.Td>
+                          <Skeleton h={10} w={36} />
+                        </Table.Td>
+                        <Table.Td>
+                          <Skeleton h={10} w="60%" />
+                        </Table.Td>
+                        <Table.Td>
+                          <Skeleton h={10} w={120} />
+                        </Table.Td>
+                        <Table.Td>
+                          <Skeleton h={10} w={90} />
+                        </Table.Td>
+                        <Table.Td>
+                          <Skeleton h={28} w={70} />
+                        </Table.Td>
+                      </Table.Tr>
+                    ))
+                  : players.map((p) => (
+                      <Table.Tr key={p.id}>
+                        <Table.Td>P{p.seat}</Table.Td>
+                        <Table.Td>{p.name}</Table.Td>
+                        <Table.Td>{p.nfcCard?.uid ?? "-"}</Table.Td>
+                        <Table.Td>{formatMoney(p.balance)}</Table.Td>
+                        <Table.Td>
+                          <Button
+                            className="mbg-click"
+                            size="xs"
+                            color="red"
+                            variant="light"
+                            loading={deletingPlayerId === p.id}
+                            disabled={!game || game.status !== "ACTIVE"}
+                            onClick={() => {
+                              void deletePlayer(p.id, p.name);
+                            }}
+                          >
+                            Hapus
+                          </Button>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
               </Table.Tbody>
             </Table>
             </div>

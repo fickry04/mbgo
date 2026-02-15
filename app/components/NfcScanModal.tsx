@@ -57,10 +57,11 @@ export function NfcScanModal({
         </Group>
 
         <Group justify="flex-end">
-          <Button variant="default" onClick={onClose}>
+          <Button className="mbg-click" variant="default" onClick={onClose}>
             Tutup
           </Button>
           <Button
+            className="mbg-click"
             onClick={handleScan}
             disabled={!supported || !secureContext}
             loading={state.status === "scanning"}

@@ -5,7 +5,7 @@ import { requireApiSession } from "@/app/api/_lib/auth-guard";
 
 const BodySchema = z.object({
   playersCount: z.number().int().min(2).max(4),
-  initialBalance: z.number().int().min(0).default(1500),
+  initialBalance: z.number().int().min(0).default(150000),
 });
 
 export async function POST(req: Request) {
