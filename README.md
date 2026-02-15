@@ -1,4 +1,5 @@
-# Monopoly Bank Go (Next.js App Router)
+# Monopoly Bank Go (MBG)
+![MBG Logo](public/logo.png)
 
 Digital bank untuk permainan Monopoly dengan kartu pemain NFC (NTAG215) menggunakan Web NFC.
 
