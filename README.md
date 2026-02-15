@@ -1,4 +1,4 @@
-# Monopoly Bank (Next.js App Router)
+# Monopoly Bank Go (Next.js App Router)
 
 Digital bank untuk permainan Monopoly dengan kartu pemain NFC (NTAG215) menggunakan Web NFC.
 
@@ -72,7 +72,7 @@ Buka http://localhost:3000
 ## Web NFC notes
 
 - Web NFC hanya berjalan di Chrome Android.
-- Umumnya butuh HTTPS, kecuali `localhost`.
+- Umumnya butuh HTTPS
 - Flow app:
 	- Buat game (Dashboard / Games)
 	- Registrasi pemain + scan UID NFC (Players)
