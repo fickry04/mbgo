@@ -40,14 +40,17 @@ export async function POST(req: Request) {
   const id = crypto.randomUUID();
 
   // Keep it simple: only 1 active token per user
-  await prisma.$executeRaw`
-    DELETE FROM "PasswordResetToken" WHERE "userId" = ${user.id}::uuid
-  `;
+  await prisma.passwordResetToken.deleteMany({where: {userId: user.id}});
 
-  await prisma.$executeRaw`
-    INSERT INTO "PasswordResetToken" ("id", "createdAt", "expiresAt", "tokenHash", "email", "userId")
-    VALUES (${id}::uuid, CURRENT_TIMESTAMP, ${expiresAt}, ${tokenHash}, ${email}, ${user.id}::uuid)
-  `;
+  await prisma.passwordResetToken.create({
+    data: {
+      id: id,
+      expiresAt: expiresAt,
+      tokenHash: tokenHash,
+      email: email,
+      userId: user.id
+    }
+  });
 
   const baseUrl = getAppBaseUrl();
   const resetUrl = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;

@@ -13,19 +13,13 @@ export async function GET(req: Request) {
 
   const tokenHash = sha256(token);
 
-  const rows = await prisma.$queryRaw<{ expiresAt: Date }[]>`
-    SELECT "expiresAt"
-    FROM "PasswordResetToken"
-    WHERE "tokenHash" = ${tokenHash}
-    LIMIT 1
-  `;
+  const row = await prisma.passwordResetToken.findUnique({where: {tokenHash: tokenHash}});
 
-  const record = rows[0];
-  if (!record) {
+  if (!row) {
     return NextResponse.json({ error: "Token not found" }, { status: 404 });
   }
 
-  if (record.expiresAt.getTime() < Date.now()) {
+  if (row.expiresAt.getTime() < Date.now()) {
     return NextResponse.json({ error: "Token expired" }, { status: 410 });
   }
 

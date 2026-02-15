@@ -48,21 +48,26 @@ export function RegisterClient() {
   return (
     <Container size={420} py="xl">
       <Stack gap="md">
-        <Title order={2} ta="center">
+        <Title order={2} ta="center" className="mbg-enter">
           Monopoly Bank Go
         </Title>
+        <Text className="mbg-enter-1" ta="center" size="sm">
+          Digital bank untuk permainan Monopoly dengan kartu pemain NFC (NTAG215)
+          menggunakan Web NFC.
+        </Text>
         <Image
           src={logo}
           alt="logo"
           width={160}
           height={160}
+          className="mbg-enter-1"
           style={{ display: "block", margin: "0 auto", maxWidth: "100%", height: "auto" }}
         />
-        <Text c="dimmed" ta="center" size="sm">
+        <Text c="dimmed" ta="center" size="sm" className="mbg-enter-2">
           Register User
         </Text>
 
-        <Card withBorder radius="md" p="lg" className="mbg-card">
+        <Card withBorder radius="md" p="lg" className="mbg-card mbg-enter-3">
           <form onSubmit={onSubmit}>
             <Stack gap="sm">
               <TextInput

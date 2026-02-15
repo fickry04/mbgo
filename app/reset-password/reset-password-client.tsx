@@ -92,7 +92,7 @@ export function ResetPasswordClient() {
   return (
     <Container size={420} py="xl">
       <Stack gap="md">
-        <Title order={2} ta="center">
+        <Title order={2} ta="center" className="mbg-enter">
           Monopoly Bank Go
         </Title>
         <Image
@@ -100,19 +100,20 @@ export function ResetPasswordClient() {
           alt="logo"
           width={160}
           height={160}
+          className="mbg-enter-1"
           style={{ display: "block", margin: "0 auto", maxWidth: "100%", height: "auto" }}
         />
-        <Text c="dimmed" ta="center" size="sm">
+        <Text c="dimmed" ta="center" size="sm" className="mbg-enter-2">
           Reset Password
         </Text>
 
         {!validating && !tokenValid ? (
-          <Alert color="red" title="Token tidak valid">
+          <Alert color="red" title="Token tidak valid" className="mbg-enter-3">
             Link reset password tidak valid atau sudah kedaluwarsa.
           </Alert>
         ) : null}
 
-        <Card withBorder radius="md" p="lg" className="mbg-card">
+        <Card withBorder radius="md" p="lg" className="mbg-card mbg-enter-3">
           <form onSubmit={onSubmit}>
             <Stack gap="sm">
               <PasswordInput

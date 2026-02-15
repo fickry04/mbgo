@@ -23,36 +23,26 @@ export async function POST(req: Request) {
   const token = parsed.data.token.trim();
   const tokenHash = sha256(token);
 
-  const rows = await prisma.$queryRaw<{ userId: string; expiresAt: Date }[]>`
-    SELECT "userId", "expiresAt"
-    FROM "PasswordResetToken"
-    WHERE "tokenHash" = ${tokenHash}
-    LIMIT 1
-  `;
+  const row = await prisma.passwordResetToken.findUnique({where: {tokenHash: tokenHash}, select: {userId: true, expiresAt: true} });
 
-  const record = rows[0];
-  if (!record) {
+  if (!row) {
     return NextResponse.json({ error: "Token not found" }, { status: 404 });
   }
 
-  if (record.expiresAt.getTime() < Date.now()) {
-    await prisma.$executeRaw`
-      DELETE FROM "PasswordResetToken" WHERE "tokenHash" = ${tokenHash}
-    `;
+  if (row.expiresAt.getTime() < Date.now()) {
+    await prisma.passwordResetToken.delete({where: {tokenHash: tokenHash}});
     return NextResponse.json({ error: "Token expired" }, { status: 410 });
   }
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
 
   await prisma.user.update({
-    where: { id: record.userId },
+    where: { id: row.userId },
     data: { passwordHash },
   });
 
   // Invalidate all reset tokens for this user
-  await prisma.$executeRaw`
-    DELETE FROM "PasswordResetToken" WHERE "userId" = ${record.userId}::uuid
-  `;
+  await prisma.passwordResetToken.deleteMany({where: {userId: row.userId}});
 
   return NextResponse.json({ ok: true });
 }
