@@ -101,7 +101,7 @@ export function RegisterClient() {
                 <Button
                   type="button"
                   variant="subtle"
-                  onClick={() => window.location.assign("/login")}
+                  onClick={() => router.push("/login")}
                 >
                   Back to Login
                 </Button>
