@@ -39,6 +39,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Seat exceeds playersCount" }, { status: 400 });
   }
 
+  const result = await prisma.$transaction(async (tx) => {
+    const existingSeat = await tx.player.findFirst({
+      where: { 
+        gameId: game.id,
+        seat: seat
+      },
+      select: { id: true }
+    });
+    if (existingSeat) throw new Error("SEAT_TAKEN");
+
     const existingUid = await tx.player.findUnique({
       where: { 
         id: game.id,
