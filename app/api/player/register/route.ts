@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
   const result = await prisma.$transaction(async (tx) => {
     const existingSeat = await tx.player.findUnique({
-      where: { gameId_seat: { gameId: game.id, seat } },
+      where: { gameId: game.id, seat: seat } },
       select: { id: true },
     });
     if (existingSeat) throw new Error("SEAT_TAKEN");
