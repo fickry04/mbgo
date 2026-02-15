@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import Image from "next/image";
-import logo from '../../public/logo.png';
+import logo from '@/public/logo.png';
 
 export function RegisterClient() {
   const router = useRouter();

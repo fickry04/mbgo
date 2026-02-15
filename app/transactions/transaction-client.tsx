@@ -22,7 +22,7 @@ import type {
   TransactionDirection,
   TransactionTemplate,
   TransactionType,
-} from "@prisma/client";
+} from "@/app/generated/prisma/client";
 import { NfcScanModal } from "@/app/components/NfcScanModal";
 import { PropertyTemplateCard } from "@/app/components/PropertyTemplateCard";
 import { fetchJson } from "@/app/lib/http";
