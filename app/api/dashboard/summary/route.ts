@@ -31,8 +31,7 @@ export async function GET(req: Request) {
 
   const players = await prisma.player.findMany({
     where: { gameId: game.id },
-    orderBy: { seat: "asc" },
-    include: { nfcCard: true },
+    orderBy: { seat: "asc" }
   });
 
   const totalCirculation = players.reduce(
