@@ -52,10 +52,7 @@ model User {
   id        String   @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // Legacy (kept for smooth migration). Not used for login anymore.
   username String? @unique
-
   email         String?  @unique
   emailVerified DateTime?
   passwordHash String
@@ -115,27 +112,13 @@ model Player {
   name    String
   seat    Int
   balance Int
-
-  nfcCard NfcCard?
+  nfcCardUid String
 
   outgoingTransactions Transaction[] @relation("FromPlayer")
   incomingTransactions Transaction[] @relation("ToPlayer")
 
-  @@unique([gameId, seat])
+  @@unique([gameId, nfcCardUid])
   @@index([gameId])
-}
-
-model NfcCard {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  uid String @unique
-
-  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  playerId String @unique @db.Uuid
-
-  @@index([uid])
 }
 
 model TransactionType {

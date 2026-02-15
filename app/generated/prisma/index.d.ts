@@ -34,11 +34,6 @@ export type Game = $Result.DefaultSelection<Prisma.$GamePayload>
  */
 export type Player = $Result.DefaultSelection<Prisma.$PlayerPayload>
 /**
- * Model NfcCard
- * 
- */
-export type NfcCard = $Result.DefaultSelection<Prisma.$NfcCardPayload>
-/**
  * Model TransactionType
  * 
  */
@@ -294,16 +289,6 @@ export class PrismaClient<
     * ```
     */
   get player(): Prisma.PlayerDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.nfcCard`: Exposes CRUD operations for the **NfcCard** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more NfcCards
-    * const nfcCards = await prisma.nfcCard.findMany()
-    * ```
-    */
-  get nfcCard(): Prisma.NfcCardDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.transactionType`: Exposes CRUD operations for the **TransactionType** model.
@@ -782,7 +767,6 @@ export namespace Prisma {
     EmailVerificationToken: 'EmailVerificationToken',
     Game: 'Game',
     Player: 'Player',
-    NfcCard: 'NfcCard',
     TransactionType: 'TransactionType',
     PropertyTemplate: 'PropertyTemplate',
     TransactionTemplate: 'TransactionTemplate',
@@ -802,7 +786,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "emailVerificationToken" | "game" | "player" | "nfcCard" | "transactionType" | "propertyTemplate" | "transactionTemplate" | "transaction"
+      modelProps: "user" | "emailVerificationToken" | "game" | "player" | "transactionType" | "propertyTemplate" | "transactionTemplate" | "transaction"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1099,80 +1083,6 @@ export namespace Prisma {
           count: {
             args: Prisma.PlayerCountArgs<ExtArgs>
             result: $Utils.Optional<PlayerCountAggregateOutputType> | number
-          }
-        }
-      }
-      NfcCard: {
-        payload: Prisma.$NfcCardPayload<ExtArgs>
-        fields: Prisma.NfcCardFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.NfcCardFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.NfcCardFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload>
-          }
-          findFirst: {
-            args: Prisma.NfcCardFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.NfcCardFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload>
-          }
-          findMany: {
-            args: Prisma.NfcCardFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload>[]
-          }
-          create: {
-            args: Prisma.NfcCardCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload>
-          }
-          createMany: {
-            args: Prisma.NfcCardCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.NfcCardCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload>[]
-          }
-          delete: {
-            args: Prisma.NfcCardDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload>
-          }
-          update: {
-            args: Prisma.NfcCardUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload>
-          }
-          deleteMany: {
-            args: Prisma.NfcCardDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.NfcCardUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.NfcCardUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload>[]
-          }
-          upsert: {
-            args: Prisma.NfcCardUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$NfcCardPayload>
-          }
-          aggregate: {
-            args: Prisma.NfcCardAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateNfcCard>
-          }
-          groupBy: {
-            args: Prisma.NfcCardGroupByArgs<ExtArgs>
-            result: $Utils.Optional<NfcCardGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.NfcCardCountArgs<ExtArgs>
-            result: $Utils.Optional<NfcCardCountAggregateOutputType> | number
           }
         }
       }
@@ -1584,7 +1494,6 @@ export namespace Prisma {
     emailVerificationToken?: EmailVerificationTokenOmit
     game?: GameOmit
     player?: PlayerOmit
-    nfcCard?: NfcCardOmit
     transactionType?: TransactionTypeOmit
     propertyTemplate?: PropertyTemplateOmit
     transactionTemplate?: TransactionTemplateOmit
@@ -5309,6 +5218,7 @@ export namespace Prisma {
     name: string | null
     seat: number | null
     balance: number | null
+    nfcCardUid: string | null
   }
 
   export type PlayerMaxAggregateOutputType = {
@@ -5319,6 +5229,7 @@ export namespace Prisma {
     name: string | null
     seat: number | null
     balance: number | null
+    nfcCardUid: string | null
   }
 
   export type PlayerCountAggregateOutputType = {
@@ -5329,6 +5240,7 @@ export namespace Prisma {
     name: number
     seat: number
     balance: number
+    nfcCardUid: number
     _all: number
   }
 
@@ -5351,6 +5263,7 @@ export namespace Prisma {
     name?: true
     seat?: true
     balance?: true
+    nfcCardUid?: true
   }
 
   export type PlayerMaxAggregateInputType = {
@@ -5361,6 +5274,7 @@ export namespace Prisma {
     name?: true
     seat?: true
     balance?: true
+    nfcCardUid?: true
   }
 
   export type PlayerCountAggregateInputType = {
@@ -5371,6 +5285,7 @@ export namespace Prisma {
     name?: true
     seat?: true
     balance?: true
+    nfcCardUid?: true
     _all?: true
   }
 
@@ -5468,6 +5383,7 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
+    nfcCardUid: string
     _count: PlayerCountAggregateOutputType | null
     _avg: PlayerAvgAggregateOutputType | null
     _sum: PlayerSumAggregateOutputType | null
@@ -5497,8 +5413,8 @@ export namespace Prisma {
     name?: boolean
     seat?: boolean
     balance?: boolean
+    nfcCardUid?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
-    nfcCard?: boolean | Player$nfcCardArgs<ExtArgs>
     outgoingTransactions?: boolean | Player$outgoingTransactionsArgs<ExtArgs>
     incomingTransactions?: boolean | Player$incomingTransactionsArgs<ExtArgs>
     _count?: boolean | PlayerCountOutputTypeDefaultArgs<ExtArgs>
@@ -5512,6 +5428,7 @@ export namespace Prisma {
     name?: boolean
     seat?: boolean
     balance?: boolean
+    nfcCardUid?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["player"]>
 
@@ -5523,6 +5440,7 @@ export namespace Prisma {
     name?: boolean
     seat?: boolean
     balance?: boolean
+    nfcCardUid?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["player"]>
 
@@ -5534,12 +5452,12 @@ export namespace Prisma {
     name?: boolean
     seat?: boolean
     balance?: boolean
+    nfcCardUid?: boolean
   }
 
-  export type PlayerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "gameId" | "name" | "seat" | "balance", ExtArgs["result"]["player"]>
+  export type PlayerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "gameId" | "name" | "seat" | "balance" | "nfcCardUid", ExtArgs["result"]["player"]>
   export type PlayerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     game?: boolean | GameDefaultArgs<ExtArgs>
-    nfcCard?: boolean | Player$nfcCardArgs<ExtArgs>
     outgoingTransactions?: boolean | Player$outgoingTransactionsArgs<ExtArgs>
     incomingTransactions?: boolean | Player$incomingTransactionsArgs<ExtArgs>
     _count?: boolean | PlayerCountOutputTypeDefaultArgs<ExtArgs>
@@ -5555,7 +5473,6 @@ export namespace Prisma {
     name: "Player"
     objects: {
       game: Prisma.$GamePayload<ExtArgs>
-      nfcCard: Prisma.$NfcCardPayload<ExtArgs> | null
       outgoingTransactions: Prisma.$TransactionPayload<ExtArgs>[]
       incomingTransactions: Prisma.$TransactionPayload<ExtArgs>[]
     }
@@ -5567,6 +5484,7 @@ export namespace Prisma {
       name: string
       seat: number
       balance: number
+      nfcCardUid: string
     }, ExtArgs["result"]["player"]>
     composites: {}
   }
@@ -5962,7 +5880,6 @@ export namespace Prisma {
   export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     game<T extends GameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GameDefaultArgs<ExtArgs>>): Prisma__GameClient<$Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    nfcCard<T extends Player$nfcCardArgs<ExtArgs> = {}>(args?: Subset<T, Player$nfcCardArgs<ExtArgs>>): Prisma__NfcCardClient<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     outgoingTransactions<T extends Player$outgoingTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Player$outgoingTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     incomingTransactions<T extends Player$incomingTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Player$incomingTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -6001,6 +5918,7 @@ export namespace Prisma {
     readonly name: FieldRef<"Player", 'String'>
     readonly seat: FieldRef<"Player", 'Int'>
     readonly balance: FieldRef<"Player", 'Int'>
+    readonly nfcCardUid: FieldRef<"Player", 'String'>
   }
     
 
@@ -6397,25 +6315,6 @@ export namespace Prisma {
   }
 
   /**
-   * Player.nfcCard
-   */
-  export type Player$nfcCardArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    where?: NfcCardWhereInput
-  }
-
-  /**
    * Player.outgoingTransactions
    */
   export type Player$outgoingTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6479,1064 +6378,6 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: PlayerInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model NfcCard
-   */
-
-  export type AggregateNfcCard = {
-    _count: NfcCardCountAggregateOutputType | null
-    _min: NfcCardMinAggregateOutputType | null
-    _max: NfcCardMaxAggregateOutputType | null
-  }
-
-  export type NfcCardMinAggregateOutputType = {
-    id: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
-    uid: string | null
-    playerId: string | null
-  }
-
-  export type NfcCardMaxAggregateOutputType = {
-    id: string | null
-    createdAt: Date | null
-    updatedAt: Date | null
-    uid: string | null
-    playerId: string | null
-  }
-
-  export type NfcCardCountAggregateOutputType = {
-    id: number
-    createdAt: number
-    updatedAt: number
-    uid: number
-    playerId: number
-    _all: number
-  }
-
-
-  export type NfcCardMinAggregateInputType = {
-    id?: true
-    createdAt?: true
-    updatedAt?: true
-    uid?: true
-    playerId?: true
-  }
-
-  export type NfcCardMaxAggregateInputType = {
-    id?: true
-    createdAt?: true
-    updatedAt?: true
-    uid?: true
-    playerId?: true
-  }
-
-  export type NfcCardCountAggregateInputType = {
-    id?: true
-    createdAt?: true
-    updatedAt?: true
-    uid?: true
-    playerId?: true
-    _all?: true
-  }
-
-  export type NfcCardAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which NfcCard to aggregate.
-     */
-    where?: NfcCardWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of NfcCards to fetch.
-     */
-    orderBy?: NfcCardOrderByWithRelationInput | NfcCardOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: NfcCardWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` NfcCards from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` NfcCards.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned NfcCards
-    **/
-    _count?: true | NfcCardCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: NfcCardMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: NfcCardMaxAggregateInputType
-  }
-
-  export type GetNfcCardAggregateType<T extends NfcCardAggregateArgs> = {
-        [P in keyof T & keyof AggregateNfcCard]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateNfcCard[P]>
-      : GetScalarType<T[P], AggregateNfcCard[P]>
-  }
-
-
-
-
-  export type NfcCardGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: NfcCardWhereInput
-    orderBy?: NfcCardOrderByWithAggregationInput | NfcCardOrderByWithAggregationInput[]
-    by: NfcCardScalarFieldEnum[] | NfcCardScalarFieldEnum
-    having?: NfcCardScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: NfcCardCountAggregateInputType | true
-    _min?: NfcCardMinAggregateInputType
-    _max?: NfcCardMaxAggregateInputType
-  }
-
-  export type NfcCardGroupByOutputType = {
-    id: string
-    createdAt: Date
-    updatedAt: Date
-    uid: string
-    playerId: string
-    _count: NfcCardCountAggregateOutputType | null
-    _min: NfcCardMinAggregateOutputType | null
-    _max: NfcCardMaxAggregateOutputType | null
-  }
-
-  type GetNfcCardGroupByPayload<T extends NfcCardGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<NfcCardGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof NfcCardGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], NfcCardGroupByOutputType[P]>
-            : GetScalarType<T[P], NfcCardGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type NfcCardSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    uid?: boolean
-    playerId?: boolean
-    player?: boolean | PlayerDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["nfcCard"]>
-
-  export type NfcCardSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    uid?: boolean
-    playerId?: boolean
-    player?: boolean | PlayerDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["nfcCard"]>
-
-  export type NfcCardSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    uid?: boolean
-    playerId?: boolean
-    player?: boolean | PlayerDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["nfcCard"]>
-
-  export type NfcCardSelectScalar = {
-    id?: boolean
-    createdAt?: boolean
-    updatedAt?: boolean
-    uid?: boolean
-    playerId?: boolean
-  }
-
-  export type NfcCardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "uid" | "playerId", ExtArgs["result"]["nfcCard"]>
-  export type NfcCardInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    player?: boolean | PlayerDefaultArgs<ExtArgs>
-  }
-  export type NfcCardIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    player?: boolean | PlayerDefaultArgs<ExtArgs>
-  }
-  export type NfcCardIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    player?: boolean | PlayerDefaultArgs<ExtArgs>
-  }
-
-  export type $NfcCardPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "NfcCard"
-    objects: {
-      player: Prisma.$PlayerPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      createdAt: Date
-      updatedAt: Date
-      uid: string
-      playerId: string
-    }, ExtArgs["result"]["nfcCard"]>
-    composites: {}
-  }
-
-  type NfcCardGetPayload<S extends boolean | null | undefined | NfcCardDefaultArgs> = $Result.GetResult<Prisma.$NfcCardPayload, S>
-
-  type NfcCardCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<NfcCardFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: NfcCardCountAggregateInputType | true
-    }
-
-  export interface NfcCardDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['NfcCard'], meta: { name: 'NfcCard' } }
-    /**
-     * Find zero or one NfcCard that matches the filter.
-     * @param {NfcCardFindUniqueArgs} args - Arguments to find a NfcCard
-     * @example
-     * // Get one NfcCard
-     * const nfcCard = await prisma.nfcCard.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends NfcCardFindUniqueArgs>(args: SelectSubset<T, NfcCardFindUniqueArgs<ExtArgs>>): Prisma__NfcCardClient<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one NfcCard that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {NfcCardFindUniqueOrThrowArgs} args - Arguments to find a NfcCard
-     * @example
-     * // Get one NfcCard
-     * const nfcCard = await prisma.nfcCard.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends NfcCardFindUniqueOrThrowArgs>(args: SelectSubset<T, NfcCardFindUniqueOrThrowArgs<ExtArgs>>): Prisma__NfcCardClient<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first NfcCard that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NfcCardFindFirstArgs} args - Arguments to find a NfcCard
-     * @example
-     * // Get one NfcCard
-     * const nfcCard = await prisma.nfcCard.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends NfcCardFindFirstArgs>(args?: SelectSubset<T, NfcCardFindFirstArgs<ExtArgs>>): Prisma__NfcCardClient<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first NfcCard that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NfcCardFindFirstOrThrowArgs} args - Arguments to find a NfcCard
-     * @example
-     * // Get one NfcCard
-     * const nfcCard = await prisma.nfcCard.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends NfcCardFindFirstOrThrowArgs>(args?: SelectSubset<T, NfcCardFindFirstOrThrowArgs<ExtArgs>>): Prisma__NfcCardClient<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more NfcCards that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NfcCardFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all NfcCards
-     * const nfcCards = await prisma.nfcCard.findMany()
-     * 
-     * // Get first 10 NfcCards
-     * const nfcCards = await prisma.nfcCard.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const nfcCardWithIdOnly = await prisma.nfcCard.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends NfcCardFindManyArgs>(args?: SelectSubset<T, NfcCardFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a NfcCard.
-     * @param {NfcCardCreateArgs} args - Arguments to create a NfcCard.
-     * @example
-     * // Create one NfcCard
-     * const NfcCard = await prisma.nfcCard.create({
-     *   data: {
-     *     // ... data to create a NfcCard
-     *   }
-     * })
-     * 
-     */
-    create<T extends NfcCardCreateArgs>(args: SelectSubset<T, NfcCardCreateArgs<ExtArgs>>): Prisma__NfcCardClient<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many NfcCards.
-     * @param {NfcCardCreateManyArgs} args - Arguments to create many NfcCards.
-     * @example
-     * // Create many NfcCards
-     * const nfcCard = await prisma.nfcCard.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends NfcCardCreateManyArgs>(args?: SelectSubset<T, NfcCardCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many NfcCards and returns the data saved in the database.
-     * @param {NfcCardCreateManyAndReturnArgs} args - Arguments to create many NfcCards.
-     * @example
-     * // Create many NfcCards
-     * const nfcCard = await prisma.nfcCard.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many NfcCards and only return the `id`
-     * const nfcCardWithIdOnly = await prisma.nfcCard.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends NfcCardCreateManyAndReturnArgs>(args?: SelectSubset<T, NfcCardCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a NfcCard.
-     * @param {NfcCardDeleteArgs} args - Arguments to delete one NfcCard.
-     * @example
-     * // Delete one NfcCard
-     * const NfcCard = await prisma.nfcCard.delete({
-     *   where: {
-     *     // ... filter to delete one NfcCard
-     *   }
-     * })
-     * 
-     */
-    delete<T extends NfcCardDeleteArgs>(args: SelectSubset<T, NfcCardDeleteArgs<ExtArgs>>): Prisma__NfcCardClient<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one NfcCard.
-     * @param {NfcCardUpdateArgs} args - Arguments to update one NfcCard.
-     * @example
-     * // Update one NfcCard
-     * const nfcCard = await prisma.nfcCard.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends NfcCardUpdateArgs>(args: SelectSubset<T, NfcCardUpdateArgs<ExtArgs>>): Prisma__NfcCardClient<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more NfcCards.
-     * @param {NfcCardDeleteManyArgs} args - Arguments to filter NfcCards to delete.
-     * @example
-     * // Delete a few NfcCards
-     * const { count } = await prisma.nfcCard.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends NfcCardDeleteManyArgs>(args?: SelectSubset<T, NfcCardDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more NfcCards.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NfcCardUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many NfcCards
-     * const nfcCard = await prisma.nfcCard.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends NfcCardUpdateManyArgs>(args: SelectSubset<T, NfcCardUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more NfcCards and returns the data updated in the database.
-     * @param {NfcCardUpdateManyAndReturnArgs} args - Arguments to update many NfcCards.
-     * @example
-     * // Update many NfcCards
-     * const nfcCard = await prisma.nfcCard.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more NfcCards and only return the `id`
-     * const nfcCardWithIdOnly = await prisma.nfcCard.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends NfcCardUpdateManyAndReturnArgs>(args: SelectSubset<T, NfcCardUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one NfcCard.
-     * @param {NfcCardUpsertArgs} args - Arguments to update or create a NfcCard.
-     * @example
-     * // Update or create a NfcCard
-     * const nfcCard = await prisma.nfcCard.upsert({
-     *   create: {
-     *     // ... data to create a NfcCard
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the NfcCard we want to update
-     *   }
-     * })
-     */
-    upsert<T extends NfcCardUpsertArgs>(args: SelectSubset<T, NfcCardUpsertArgs<ExtArgs>>): Prisma__NfcCardClient<$Result.GetResult<Prisma.$NfcCardPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of NfcCards.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NfcCardCountArgs} args - Arguments to filter NfcCards to count.
-     * @example
-     * // Count the number of NfcCards
-     * const count = await prisma.nfcCard.count({
-     *   where: {
-     *     // ... the filter for the NfcCards we want to count
-     *   }
-     * })
-    **/
-    count<T extends NfcCardCountArgs>(
-      args?: Subset<T, NfcCardCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], NfcCardCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a NfcCard.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NfcCardAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends NfcCardAggregateArgs>(args: Subset<T, NfcCardAggregateArgs>): Prisma.PrismaPromise<GetNfcCardAggregateType<T>>
-
-    /**
-     * Group by NfcCard.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {NfcCardGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends NfcCardGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: NfcCardGroupByArgs['orderBy'] }
-        : { orderBy?: NfcCardGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, NfcCardGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetNfcCardGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the NfcCard model
-   */
-  readonly fields: NfcCardFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for NfcCard.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__NfcCardClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    player<T extends PlayerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PlayerDefaultArgs<ExtArgs>>): Prisma__PlayerClient<$Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the NfcCard model
-   */
-  interface NfcCardFieldRefs {
-    readonly id: FieldRef<"NfcCard", 'String'>
-    readonly createdAt: FieldRef<"NfcCard", 'DateTime'>
-    readonly updatedAt: FieldRef<"NfcCard", 'DateTime'>
-    readonly uid: FieldRef<"NfcCard", 'String'>
-    readonly playerId: FieldRef<"NfcCard", 'String'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * NfcCard findUnique
-   */
-  export type NfcCardFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    /**
-     * Filter, which NfcCard to fetch.
-     */
-    where: NfcCardWhereUniqueInput
-  }
-
-  /**
-   * NfcCard findUniqueOrThrow
-   */
-  export type NfcCardFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    /**
-     * Filter, which NfcCard to fetch.
-     */
-    where: NfcCardWhereUniqueInput
-  }
-
-  /**
-   * NfcCard findFirst
-   */
-  export type NfcCardFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    /**
-     * Filter, which NfcCard to fetch.
-     */
-    where?: NfcCardWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of NfcCards to fetch.
-     */
-    orderBy?: NfcCardOrderByWithRelationInput | NfcCardOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for NfcCards.
-     */
-    cursor?: NfcCardWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` NfcCards from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` NfcCards.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of NfcCards.
-     */
-    distinct?: NfcCardScalarFieldEnum | NfcCardScalarFieldEnum[]
-  }
-
-  /**
-   * NfcCard findFirstOrThrow
-   */
-  export type NfcCardFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    /**
-     * Filter, which NfcCard to fetch.
-     */
-    where?: NfcCardWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of NfcCards to fetch.
-     */
-    orderBy?: NfcCardOrderByWithRelationInput | NfcCardOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for NfcCards.
-     */
-    cursor?: NfcCardWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` NfcCards from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` NfcCards.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of NfcCards.
-     */
-    distinct?: NfcCardScalarFieldEnum | NfcCardScalarFieldEnum[]
-  }
-
-  /**
-   * NfcCard findMany
-   */
-  export type NfcCardFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    /**
-     * Filter, which NfcCards to fetch.
-     */
-    where?: NfcCardWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of NfcCards to fetch.
-     */
-    orderBy?: NfcCardOrderByWithRelationInput | NfcCardOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing NfcCards.
-     */
-    cursor?: NfcCardWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` NfcCards from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` NfcCards.
-     */
-    skip?: number
-    distinct?: NfcCardScalarFieldEnum | NfcCardScalarFieldEnum[]
-  }
-
-  /**
-   * NfcCard create
-   */
-  export type NfcCardCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    /**
-     * The data needed to create a NfcCard.
-     */
-    data: XOR<NfcCardCreateInput, NfcCardUncheckedCreateInput>
-  }
-
-  /**
-   * NfcCard createMany
-   */
-  export type NfcCardCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many NfcCards.
-     */
-    data: NfcCardCreateManyInput | NfcCardCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * NfcCard createManyAndReturn
-   */
-  export type NfcCardCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * The data used to create many NfcCards.
-     */
-    data: NfcCardCreateManyInput | NfcCardCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * NfcCard update
-   */
-  export type NfcCardUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    /**
-     * The data needed to update a NfcCard.
-     */
-    data: XOR<NfcCardUpdateInput, NfcCardUncheckedUpdateInput>
-    /**
-     * Choose, which NfcCard to update.
-     */
-    where: NfcCardWhereUniqueInput
-  }
-
-  /**
-   * NfcCard updateMany
-   */
-  export type NfcCardUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update NfcCards.
-     */
-    data: XOR<NfcCardUpdateManyMutationInput, NfcCardUncheckedUpdateManyInput>
-    /**
-     * Filter which NfcCards to update
-     */
-    where?: NfcCardWhereInput
-    /**
-     * Limit how many NfcCards to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * NfcCard updateManyAndReturn
-   */
-  export type NfcCardUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * The data used to update NfcCards.
-     */
-    data: XOR<NfcCardUpdateManyMutationInput, NfcCardUncheckedUpdateManyInput>
-    /**
-     * Filter which NfcCards to update
-     */
-    where?: NfcCardWhereInput
-    /**
-     * Limit how many NfcCards to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * NfcCard upsert
-   */
-  export type NfcCardUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    /**
-     * The filter to search for the NfcCard to update in case it exists.
-     */
-    where: NfcCardWhereUniqueInput
-    /**
-     * In case the NfcCard found by the `where` argument doesn't exist, create a new NfcCard with this data.
-     */
-    create: XOR<NfcCardCreateInput, NfcCardUncheckedCreateInput>
-    /**
-     * In case the NfcCard was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<NfcCardUpdateInput, NfcCardUncheckedUpdateInput>
-  }
-
-  /**
-   * NfcCard delete
-   */
-  export type NfcCardDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
-    /**
-     * Filter which NfcCard to delete.
-     */
-    where: NfcCardWhereUniqueInput
-  }
-
-  /**
-   * NfcCard deleteMany
-   */
-  export type NfcCardDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which NfcCards to delete
-     */
-    where?: NfcCardWhereInput
-    /**
-     * Limit how many NfcCards to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * NfcCard without action
-   */
-  export type NfcCardDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the NfcCard
-     */
-    select?: NfcCardSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the NfcCard
-     */
-    omit?: NfcCardOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: NfcCardInclude<ExtArgs> | null
   }
 
 
@@ -12522,21 +11363,11 @@ export namespace Prisma {
     gameId: 'gameId',
     name: 'name',
     seat: 'seat',
-    balance: 'balance'
+    balance: 'balance',
+    nfcCardUid: 'nfcCardUid'
   };
 
   export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
-
-
-  export const NfcCardScalarFieldEnum: {
-    id: 'id',
-    createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-    uid: 'uid',
-    playerId: 'playerId'
-  };
-
-  export type NfcCardScalarFieldEnum = (typeof NfcCardScalarFieldEnum)[keyof typeof NfcCardScalarFieldEnum]
 
 
   export const TransactionTypeScalarFieldEnum: {
@@ -12993,8 +11824,8 @@ export namespace Prisma {
     name?: StringFilter<"Player"> | string
     seat?: IntFilter<"Player"> | number
     balance?: IntFilter<"Player"> | number
+    nfcCardUid?: StringFilter<"Player"> | string
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-    nfcCard?: XOR<NfcCardNullableScalarRelationFilter, NfcCardWhereInput> | null
     outgoingTransactions?: TransactionListRelationFilter
     incomingTransactions?: TransactionListRelationFilter
   }
@@ -13007,15 +11838,15 @@ export namespace Prisma {
     name?: SortOrder
     seat?: SortOrder
     balance?: SortOrder
+    nfcCardUid?: SortOrder
     game?: GameOrderByWithRelationInput
-    nfcCard?: NfcCardOrderByWithRelationInput
     outgoingTransactions?: TransactionOrderByRelationAggregateInput
     incomingTransactions?: TransactionOrderByRelationAggregateInput
   }
 
   export type PlayerWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    gameId_seat?: PlayerGameIdSeatCompoundUniqueInput
+    gameId_nfcCardUid?: PlayerGameIdNfcCardUidCompoundUniqueInput
     AND?: PlayerWhereInput | PlayerWhereInput[]
     OR?: PlayerWhereInput[]
     NOT?: PlayerWhereInput | PlayerWhereInput[]
@@ -13025,11 +11856,11 @@ export namespace Prisma {
     name?: StringFilter<"Player"> | string
     seat?: IntFilter<"Player"> | number
     balance?: IntFilter<"Player"> | number
+    nfcCardUid?: StringFilter<"Player"> | string
     game?: XOR<GameScalarRelationFilter, GameWhereInput>
-    nfcCard?: XOR<NfcCardNullableScalarRelationFilter, NfcCardWhereInput> | null
     outgoingTransactions?: TransactionListRelationFilter
     incomingTransactions?: TransactionListRelationFilter
-  }, "id" | "gameId_seat">
+  }, "id" | "gameId_nfcCardUid">
 
   export type PlayerOrderByWithAggregationInput = {
     id?: SortOrder
@@ -13039,6 +11870,7 @@ export namespace Prisma {
     name?: SortOrder
     seat?: SortOrder
     balance?: SortOrder
+    nfcCardUid?: SortOrder
     _count?: PlayerCountOrderByAggregateInput
     _avg?: PlayerAvgOrderByAggregateInput
     _max?: PlayerMaxOrderByAggregateInput
@@ -13057,61 +11889,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Player"> | string
     seat?: IntWithAggregatesFilter<"Player"> | number
     balance?: IntWithAggregatesFilter<"Player"> | number
-  }
-
-  export type NfcCardWhereInput = {
-    AND?: NfcCardWhereInput | NfcCardWhereInput[]
-    OR?: NfcCardWhereInput[]
-    NOT?: NfcCardWhereInput | NfcCardWhereInput[]
-    id?: UuidFilter<"NfcCard"> | string
-    createdAt?: DateTimeFilter<"NfcCard"> | Date | string
-    updatedAt?: DateTimeFilter<"NfcCard"> | Date | string
-    uid?: StringFilter<"NfcCard"> | string
-    playerId?: UuidFilter<"NfcCard"> | string
-    player?: XOR<PlayerScalarRelationFilter, PlayerWhereInput>
-  }
-
-  export type NfcCardOrderByWithRelationInput = {
-    id?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    uid?: SortOrder
-    playerId?: SortOrder
-    player?: PlayerOrderByWithRelationInput
-  }
-
-  export type NfcCardWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    uid?: string
-    playerId?: string
-    AND?: NfcCardWhereInput | NfcCardWhereInput[]
-    OR?: NfcCardWhereInput[]
-    NOT?: NfcCardWhereInput | NfcCardWhereInput[]
-    createdAt?: DateTimeFilter<"NfcCard"> | Date | string
-    updatedAt?: DateTimeFilter<"NfcCard"> | Date | string
-    player?: XOR<PlayerScalarRelationFilter, PlayerWhereInput>
-  }, "id" | "uid" | "playerId">
-
-  export type NfcCardOrderByWithAggregationInput = {
-    id?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    uid?: SortOrder
-    playerId?: SortOrder
-    _count?: NfcCardCountOrderByAggregateInput
-    _max?: NfcCardMaxOrderByAggregateInput
-    _min?: NfcCardMinOrderByAggregateInput
-  }
-
-  export type NfcCardScalarWhereWithAggregatesInput = {
-    AND?: NfcCardScalarWhereWithAggregatesInput | NfcCardScalarWhereWithAggregatesInput[]
-    OR?: NfcCardScalarWhereWithAggregatesInput[]
-    NOT?: NfcCardScalarWhereWithAggregatesInput | NfcCardScalarWhereWithAggregatesInput[]
-    id?: UuidWithAggregatesFilter<"NfcCard"> | string
-    createdAt?: DateTimeWithAggregatesFilter<"NfcCard"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"NfcCard"> | Date | string
-    uid?: StringWithAggregatesFilter<"NfcCard"> | string
-    playerId?: UuidWithAggregatesFilter<"NfcCard"> | string
+    nfcCardUid?: StringWithAggregatesFilter<"Player"> | string
   }
 
   export type TransactionTypeWhereInput = {
@@ -13743,8 +12521,8 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
+    nfcCardUid: string
     game: GameCreateNestedOneWithoutPlayersInput
-    nfcCard?: NfcCardCreateNestedOneWithoutPlayerInput
     outgoingTransactions?: TransactionCreateNestedManyWithoutFromPlayerInput
     incomingTransactions?: TransactionCreateNestedManyWithoutToPlayerInput
   }
@@ -13757,7 +12535,7 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
-    nfcCard?: NfcCardUncheckedCreateNestedOneWithoutPlayerInput
+    nfcCardUid: string
     outgoingTransactions?: TransactionUncheckedCreateNestedManyWithoutFromPlayerInput
     incomingTransactions?: TransactionUncheckedCreateNestedManyWithoutToPlayerInput
   }
@@ -13769,8 +12547,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
     game?: GameUpdateOneRequiredWithoutPlayersNestedInput
-    nfcCard?: NfcCardUpdateOneWithoutPlayerNestedInput
     outgoingTransactions?: TransactionUpdateManyWithoutFromPlayerNestedInput
     incomingTransactions?: TransactionUpdateManyWithoutToPlayerNestedInput
   }
@@ -13783,7 +12561,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
-    nfcCard?: NfcCardUncheckedUpdateOneWithoutPlayerNestedInput
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
     outgoingTransactions?: TransactionUncheckedUpdateManyWithoutFromPlayerNestedInput
     incomingTransactions?: TransactionUncheckedUpdateManyWithoutToPlayerNestedInput
   }
@@ -13796,6 +12574,7 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
+    nfcCardUid: string
   }
 
   export type PlayerUpdateManyMutationInput = {
@@ -13805,6 +12584,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
   }
 
   export type PlayerUncheckedUpdateManyInput = {
@@ -13815,61 +12595,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
-  }
-
-  export type NfcCardCreateInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    uid: string
-    player: PlayerCreateNestedOneWithoutNfcCardInput
-  }
-
-  export type NfcCardUncheckedCreateInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    uid: string
-    playerId: string
-  }
-
-  export type NfcCardUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    uid?: StringFieldUpdateOperationsInput | string
-    player?: PlayerUpdateOneRequiredWithoutNfcCardNestedInput
-  }
-
-  export type NfcCardUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    uid?: StringFieldUpdateOperationsInput | string
-    playerId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type NfcCardCreateManyInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    uid: string
-    playerId: string
-  }
-
-  export type NfcCardUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    uid?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type NfcCardUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    uid?: StringFieldUpdateOperationsInput | string
-    playerId?: StringFieldUpdateOperationsInput | string
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
   }
 
   export type TransactionTypeCreateInput = {
@@ -14689,14 +13415,9 @@ export namespace Prisma {
     isNot?: GameWhereInput
   }
 
-  export type NfcCardNullableScalarRelationFilter = {
-    is?: NfcCardWhereInput | null
-    isNot?: NfcCardWhereInput | null
-  }
-
-  export type PlayerGameIdSeatCompoundUniqueInput = {
+  export type PlayerGameIdNfcCardUidCompoundUniqueInput = {
     gameId: string
-    seat: number
+    nfcCardUid: string
   }
 
   export type PlayerCountOrderByAggregateInput = {
@@ -14707,6 +13428,7 @@ export namespace Prisma {
     name?: SortOrder
     seat?: SortOrder
     balance?: SortOrder
+    nfcCardUid?: SortOrder
   }
 
   export type PlayerAvgOrderByAggregateInput = {
@@ -14722,6 +13444,7 @@ export namespace Prisma {
     name?: SortOrder
     seat?: SortOrder
     balance?: SortOrder
+    nfcCardUid?: SortOrder
   }
 
   export type PlayerMinOrderByAggregateInput = {
@@ -14732,40 +13455,12 @@ export namespace Prisma {
     name?: SortOrder
     seat?: SortOrder
     balance?: SortOrder
+    nfcCardUid?: SortOrder
   }
 
   export type PlayerSumOrderByAggregateInput = {
     seat?: SortOrder
     balance?: SortOrder
-  }
-
-  export type PlayerScalarRelationFilter = {
-    is?: PlayerWhereInput
-    isNot?: PlayerWhereInput
-  }
-
-  export type NfcCardCountOrderByAggregateInput = {
-    id?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    uid?: SortOrder
-    playerId?: SortOrder
-  }
-
-  export type NfcCardMaxOrderByAggregateInput = {
-    id?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    uid?: SortOrder
-    playerId?: SortOrder
-  }
-
-  export type NfcCardMinOrderByAggregateInput = {
-    id?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    uid?: SortOrder
-    playerId?: SortOrder
   }
 
   export type EnumTransactionKindFilter<$PrismaModel = never> = {
@@ -15358,12 +14053,6 @@ export namespace Prisma {
     connect?: GameWhereUniqueInput
   }
 
-  export type NfcCardCreateNestedOneWithoutPlayerInput = {
-    create?: XOR<NfcCardCreateWithoutPlayerInput, NfcCardUncheckedCreateWithoutPlayerInput>
-    connectOrCreate?: NfcCardCreateOrConnectWithoutPlayerInput
-    connect?: NfcCardWhereUniqueInput
-  }
-
   export type TransactionCreateNestedManyWithoutFromPlayerInput = {
     create?: XOR<TransactionCreateWithoutFromPlayerInput, TransactionUncheckedCreateWithoutFromPlayerInput> | TransactionCreateWithoutFromPlayerInput[] | TransactionUncheckedCreateWithoutFromPlayerInput[]
     connectOrCreate?: TransactionCreateOrConnectWithoutFromPlayerInput | TransactionCreateOrConnectWithoutFromPlayerInput[]
@@ -15376,12 +14065,6 @@ export namespace Prisma {
     connectOrCreate?: TransactionCreateOrConnectWithoutToPlayerInput | TransactionCreateOrConnectWithoutToPlayerInput[]
     createMany?: TransactionCreateManyToPlayerInputEnvelope
     connect?: TransactionWhereUniqueInput | TransactionWhereUniqueInput[]
-  }
-
-  export type NfcCardUncheckedCreateNestedOneWithoutPlayerInput = {
-    create?: XOR<NfcCardCreateWithoutPlayerInput, NfcCardUncheckedCreateWithoutPlayerInput>
-    connectOrCreate?: NfcCardCreateOrConnectWithoutPlayerInput
-    connect?: NfcCardWhereUniqueInput
   }
 
   export type TransactionUncheckedCreateNestedManyWithoutFromPlayerInput = {
@@ -15404,16 +14087,6 @@ export namespace Prisma {
     upsert?: GameUpsertWithoutPlayersInput
     connect?: GameWhereUniqueInput
     update?: XOR<XOR<GameUpdateToOneWithWhereWithoutPlayersInput, GameUpdateWithoutPlayersInput>, GameUncheckedUpdateWithoutPlayersInput>
-  }
-
-  export type NfcCardUpdateOneWithoutPlayerNestedInput = {
-    create?: XOR<NfcCardCreateWithoutPlayerInput, NfcCardUncheckedCreateWithoutPlayerInput>
-    connectOrCreate?: NfcCardCreateOrConnectWithoutPlayerInput
-    upsert?: NfcCardUpsertWithoutPlayerInput
-    disconnect?: NfcCardWhereInput | boolean
-    delete?: NfcCardWhereInput | boolean
-    connect?: NfcCardWhereUniqueInput
-    update?: XOR<XOR<NfcCardUpdateToOneWithWhereWithoutPlayerInput, NfcCardUpdateWithoutPlayerInput>, NfcCardUncheckedUpdateWithoutPlayerInput>
   }
 
   export type TransactionUpdateManyWithoutFromPlayerNestedInput = {
@@ -15444,16 +14117,6 @@ export namespace Prisma {
     deleteMany?: TransactionScalarWhereInput | TransactionScalarWhereInput[]
   }
 
-  export type NfcCardUncheckedUpdateOneWithoutPlayerNestedInput = {
-    create?: XOR<NfcCardCreateWithoutPlayerInput, NfcCardUncheckedCreateWithoutPlayerInput>
-    connectOrCreate?: NfcCardCreateOrConnectWithoutPlayerInput
-    upsert?: NfcCardUpsertWithoutPlayerInput
-    disconnect?: NfcCardWhereInput | boolean
-    delete?: NfcCardWhereInput | boolean
-    connect?: NfcCardWhereUniqueInput
-    update?: XOR<XOR<NfcCardUpdateToOneWithWhereWithoutPlayerInput, NfcCardUpdateWithoutPlayerInput>, NfcCardUncheckedUpdateWithoutPlayerInput>
-  }
-
   export type TransactionUncheckedUpdateManyWithoutFromPlayerNestedInput = {
     create?: XOR<TransactionCreateWithoutFromPlayerInput, TransactionUncheckedCreateWithoutFromPlayerInput> | TransactionCreateWithoutFromPlayerInput[] | TransactionUncheckedCreateWithoutFromPlayerInput[]
     connectOrCreate?: TransactionCreateOrConnectWithoutFromPlayerInput | TransactionCreateOrConnectWithoutFromPlayerInput[]
@@ -15480,20 +14143,6 @@ export namespace Prisma {
     update?: TransactionUpdateWithWhereUniqueWithoutToPlayerInput | TransactionUpdateWithWhereUniqueWithoutToPlayerInput[]
     updateMany?: TransactionUpdateManyWithWhereWithoutToPlayerInput | TransactionUpdateManyWithWhereWithoutToPlayerInput[]
     deleteMany?: TransactionScalarWhereInput | TransactionScalarWhereInput[]
-  }
-
-  export type PlayerCreateNestedOneWithoutNfcCardInput = {
-    create?: XOR<PlayerCreateWithoutNfcCardInput, PlayerUncheckedCreateWithoutNfcCardInput>
-    connectOrCreate?: PlayerCreateOrConnectWithoutNfcCardInput
-    connect?: PlayerWhereUniqueInput
-  }
-
-  export type PlayerUpdateOneRequiredWithoutNfcCardNestedInput = {
-    create?: XOR<PlayerCreateWithoutNfcCardInput, PlayerUncheckedCreateWithoutNfcCardInput>
-    connectOrCreate?: PlayerCreateOrConnectWithoutNfcCardInput
-    upsert?: PlayerUpsertWithoutNfcCardInput
-    connect?: PlayerWhereUniqueInput
-    update?: XOR<XOR<PlayerUpdateToOneWithWhereWithoutNfcCardInput, PlayerUpdateWithoutNfcCardInput>, PlayerUncheckedUpdateWithoutNfcCardInput>
   }
 
   export type TransactionTemplateCreateNestedManyWithoutTransactionTypeInput = {
@@ -16274,7 +14923,7 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
-    nfcCard?: NfcCardCreateNestedOneWithoutPlayerInput
+    nfcCardUid: string
     outgoingTransactions?: TransactionCreateNestedManyWithoutFromPlayerInput
     incomingTransactions?: TransactionCreateNestedManyWithoutToPlayerInput
   }
@@ -16286,7 +14935,7 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
-    nfcCard?: NfcCardUncheckedCreateNestedOneWithoutPlayerInput
+    nfcCardUid: string
     outgoingTransactions?: TransactionUncheckedCreateNestedManyWithoutFromPlayerInput
     incomingTransactions?: TransactionUncheckedCreateNestedManyWithoutToPlayerInput
   }
@@ -16403,6 +15052,7 @@ export namespace Prisma {
     name?: StringFilter<"Player"> | string
     seat?: IntFilter<"Player"> | number
     balance?: IntFilter<"Player"> | number
+    nfcCardUid?: StringFilter<"Player"> | string
   }
 
   export type TransactionUpsertWithWhereUniqueWithoutGameInput = {
@@ -16470,25 +15120,6 @@ export namespace Prisma {
   export type GameCreateOrConnectWithoutPlayersInput = {
     where: GameWhereUniqueInput
     create: XOR<GameCreateWithoutPlayersInput, GameUncheckedCreateWithoutPlayersInput>
-  }
-
-  export type NfcCardCreateWithoutPlayerInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    uid: string
-  }
-
-  export type NfcCardUncheckedCreateWithoutPlayerInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    uid: string
-  }
-
-  export type NfcCardCreateOrConnectWithoutPlayerInput = {
-    where: NfcCardWhereUniqueInput
-    create: XOR<NfcCardCreateWithoutPlayerInput, NfcCardUncheckedCreateWithoutPlayerInput>
   }
 
   export type TransactionCreateWithoutFromPlayerInput = {
@@ -16612,31 +15243,6 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutGameNestedInput
   }
 
-  export type NfcCardUpsertWithoutPlayerInput = {
-    update: XOR<NfcCardUpdateWithoutPlayerInput, NfcCardUncheckedUpdateWithoutPlayerInput>
-    create: XOR<NfcCardCreateWithoutPlayerInput, NfcCardUncheckedCreateWithoutPlayerInput>
-    where?: NfcCardWhereInput
-  }
-
-  export type NfcCardUpdateToOneWithWhereWithoutPlayerInput = {
-    where?: NfcCardWhereInput
-    data: XOR<NfcCardUpdateWithoutPlayerInput, NfcCardUncheckedUpdateWithoutPlayerInput>
-  }
-
-  export type NfcCardUpdateWithoutPlayerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    uid?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type NfcCardUncheckedUpdateWithoutPlayerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    uid?: StringFieldUpdateOperationsInput | string
-  }
-
   export type TransactionUpsertWithWhereUniqueWithoutFromPlayerInput = {
     where: TransactionWhereUniqueInput
     update: XOR<TransactionUpdateWithoutFromPlayerInput, TransactionUncheckedUpdateWithoutFromPlayerInput>
@@ -16667,70 +15273,6 @@ export namespace Prisma {
   export type TransactionUpdateManyWithWhereWithoutToPlayerInput = {
     where: TransactionScalarWhereInput
     data: XOR<TransactionUpdateManyMutationInput, TransactionUncheckedUpdateManyWithoutToPlayerInput>
-  }
-
-  export type PlayerCreateWithoutNfcCardInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    name: string
-    seat: number
-    balance: number
-    game: GameCreateNestedOneWithoutPlayersInput
-    outgoingTransactions?: TransactionCreateNestedManyWithoutFromPlayerInput
-    incomingTransactions?: TransactionCreateNestedManyWithoutToPlayerInput
-  }
-
-  export type PlayerUncheckedCreateWithoutNfcCardInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    gameId: string
-    name: string
-    seat: number
-    balance: number
-    outgoingTransactions?: TransactionUncheckedCreateNestedManyWithoutFromPlayerInput
-    incomingTransactions?: TransactionUncheckedCreateNestedManyWithoutToPlayerInput
-  }
-
-  export type PlayerCreateOrConnectWithoutNfcCardInput = {
-    where: PlayerWhereUniqueInput
-    create: XOR<PlayerCreateWithoutNfcCardInput, PlayerUncheckedCreateWithoutNfcCardInput>
-  }
-
-  export type PlayerUpsertWithoutNfcCardInput = {
-    update: XOR<PlayerUpdateWithoutNfcCardInput, PlayerUncheckedUpdateWithoutNfcCardInput>
-    create: XOR<PlayerCreateWithoutNfcCardInput, PlayerUncheckedCreateWithoutNfcCardInput>
-    where?: PlayerWhereInput
-  }
-
-  export type PlayerUpdateToOneWithWhereWithoutNfcCardInput = {
-    where?: PlayerWhereInput
-    data: XOR<PlayerUpdateWithoutNfcCardInput, PlayerUncheckedUpdateWithoutNfcCardInput>
-  }
-
-  export type PlayerUpdateWithoutNfcCardInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    name?: StringFieldUpdateOperationsInput | string
-    seat?: IntFieldUpdateOperationsInput | number
-    balance?: IntFieldUpdateOperationsInput | number
-    game?: GameUpdateOneRequiredWithoutPlayersNestedInput
-    outgoingTransactions?: TransactionUpdateManyWithoutFromPlayerNestedInput
-    incomingTransactions?: TransactionUpdateManyWithoutToPlayerNestedInput
-  }
-
-  export type PlayerUncheckedUpdateWithoutNfcCardInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    gameId?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    seat?: IntFieldUpdateOperationsInput | number
-    balance?: IntFieldUpdateOperationsInput | number
-    outgoingTransactions?: TransactionUncheckedUpdateManyWithoutFromPlayerNestedInput
-    incomingTransactions?: TransactionUncheckedUpdateManyWithoutToPlayerNestedInput
   }
 
   export type TransactionTemplateCreateWithoutTransactionTypeInput = {
@@ -17131,8 +15673,8 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
+    nfcCardUid: string
     game: GameCreateNestedOneWithoutPlayersInput
-    nfcCard?: NfcCardCreateNestedOneWithoutPlayerInput
     incomingTransactions?: TransactionCreateNestedManyWithoutToPlayerInput
   }
 
@@ -17144,7 +15686,7 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
-    nfcCard?: NfcCardUncheckedCreateNestedOneWithoutPlayerInput
+    nfcCardUid: string
     incomingTransactions?: TransactionUncheckedCreateNestedManyWithoutToPlayerInput
   }
 
@@ -17160,8 +15702,8 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
+    nfcCardUid: string
     game: GameCreateNestedOneWithoutPlayersInput
-    nfcCard?: NfcCardCreateNestedOneWithoutPlayerInput
     outgoingTransactions?: TransactionCreateNestedManyWithoutFromPlayerInput
   }
 
@@ -17173,7 +15715,7 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
-    nfcCard?: NfcCardUncheckedCreateNestedOneWithoutPlayerInput
+    nfcCardUid: string
     outgoingTransactions?: TransactionUncheckedCreateNestedManyWithoutFromPlayerInput
   }
 
@@ -17266,8 +15808,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
     game?: GameUpdateOneRequiredWithoutPlayersNestedInput
-    nfcCard?: NfcCardUpdateOneWithoutPlayerNestedInput
     incomingTransactions?: TransactionUpdateManyWithoutToPlayerNestedInput
   }
 
@@ -17279,7 +15821,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
-    nfcCard?: NfcCardUncheckedUpdateOneWithoutPlayerNestedInput
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
     incomingTransactions?: TransactionUncheckedUpdateManyWithoutToPlayerNestedInput
   }
 
@@ -17301,8 +15843,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
     game?: GameUpdateOneRequiredWithoutPlayersNestedInput
-    nfcCard?: NfcCardUpdateOneWithoutPlayerNestedInput
     outgoingTransactions?: TransactionUpdateManyWithoutFromPlayerNestedInput
   }
 
@@ -17314,7 +15856,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
-    nfcCard?: NfcCardUncheckedUpdateOneWithoutPlayerNestedInput
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
     outgoingTransactions?: TransactionUncheckedUpdateManyWithoutFromPlayerNestedInput
   }
 
@@ -17405,6 +15947,7 @@ export namespace Prisma {
     name: string
     seat: number
     balance: number
+    nfcCardUid: string
   }
 
   export type TransactionCreateManyGameInput = {
@@ -17430,7 +15973,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
-    nfcCard?: NfcCardUpdateOneWithoutPlayerNestedInput
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
     outgoingTransactions?: TransactionUpdateManyWithoutFromPlayerNestedInput
     incomingTransactions?: TransactionUpdateManyWithoutToPlayerNestedInput
   }
@@ -17442,7 +15985,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
-    nfcCard?: NfcCardUncheckedUpdateOneWithoutPlayerNestedInput
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
     outgoingTransactions?: TransactionUncheckedUpdateManyWithoutFromPlayerNestedInput
     incomingTransactions?: TransactionUncheckedUpdateManyWithoutToPlayerNestedInput
   }
@@ -17454,6 +15997,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     seat?: IntFieldUpdateOperationsInput | number
     balance?: IntFieldUpdateOperationsInput | number
+    nfcCardUid?: StringFieldUpdateOperationsInput | string
   }
 
   export type TransactionUpdateWithoutGameInput = {

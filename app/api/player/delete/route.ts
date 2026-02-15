@@ -4,8 +4,7 @@ import { prisma } from "@/app/lib/prisma";
 import { requireApiSession } from "@/app/api/_lib/auth-guard";
 
 const BodySchema = z.object({
-  uid: z.string().min(1),
-  nfcCardUid: z.string(),
+  playerId: z.string().uuid(),
   gameId: z.string().uuid().optional(),
 });
 
@@ -23,28 +22,35 @@ export async function POST(req: Request) {
     );
   }
 
-  const { uid, nfcCardUid, gameId } = parsed.data;
+  const { playerId, gameId } = parsed.data;
 
-  const player = await prisma.player.findUnique({
-    where: { 
-        id: uid,
-        gameId: gameId,
-        nfcCardUid: nfcCardUid
+  const player = await prisma.player.findFirst({
+    where: {
+      id: playerId,
+      ...(gameId ? { gameId } : {}),
+      game: {
+        is: {
+          ownerUserId: session.user.id,
+        },
+      },
+    },
+    select: {
+      id: true,
+      game: {
+        select: {
+          id: true,
+          status: true,
+        },
+      },
     },
   });
 
-  if (!player) return NextResponse.json({ error: "This card player not registered" }, { status: 404 });
-
-  if (gameId && player.gameId !== gameId) {
-    return NextResponse.json({ error: "Player belongs to different game" }, { status: 400 });
+  if (!player) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (player.game.status !== "ACTIVE") {
+    return NextResponse.json({ error: "Game already ended" }, { status: 400 });
   }
 
-  return NextResponse.json({
-    uid: player.nfcCardUid,
-    id: player.id,
-    name: player.name,
-    seat: player.seat,
-    balance: player.balance,
-    gameId: player.gameId,
-});
+  await prisma.player.delete({ where: { id: player.id } });
+
+  return NextResponse.json({ ok: true });
 }

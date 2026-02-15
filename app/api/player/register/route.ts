@@ -46,8 +46,11 @@ export async function POST(req: Request) {
     });
     if (existingSeat) throw new Error("SEAT_TAKEN");
 
-    const existingUid = await tx.nfcCard.findUnique({
-      where: { uid: nfcUid },
+    const existingUid = await tx.player.findUnique({
+      where: { 
+        id: game.id,
+        nfcCardUid: nfcUid
+      },
       select: { id: true },
     });
     if (existingUid) throw new Error("UID_TAKEN");
@@ -58,13 +61,8 @@ export async function POST(req: Request) {
         name,
         seat,
         balance: game.initialBalance,
-        nfcCard: {
-          create: {
-            uid: nfcUid,
-          },
-        },
-      },
-      include: { nfcCard: true },
+        nfcCardUid: nfcUid
+      }
     });
 
     return player;

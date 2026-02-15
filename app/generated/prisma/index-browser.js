@@ -158,15 +158,8 @@ exports.Prisma.PlayerScalarFieldEnum = {
   gameId: 'gameId',
   name: 'name',
   seat: 'seat',
-  balance: 'balance'
-};
-
-exports.Prisma.NfcCardScalarFieldEnum = {
-  id: 'id',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  uid: 'uid',
-  playerId: 'playerId'
+  balance: 'balance',
+  nfcCardUid: 'nfcCardUid'
 };
 
 exports.Prisma.TransactionTypeScalarFieldEnum = {
@@ -289,7 +282,6 @@ exports.Prisma.ModelName = {
   EmailVerificationToken: 'EmailVerificationToken',
   Game: 'Game',
   Player: 'Player',
-  NfcCard: 'NfcCard',
   TransactionType: 'TransactionType',
   PropertyTemplate: 'PropertyTemplate',
   TransactionTemplate: 'TransactionTemplate',

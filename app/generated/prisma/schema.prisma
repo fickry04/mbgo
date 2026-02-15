@@ -49,13 +49,10 @@ enum PropertyKind {
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Legacy (kept for smooth migration). Not used for login anymore.
-  username String? @unique
-
+  id            String    @id @default(uuid()) @db.Uuid
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  username      String?   @unique
   email         String?   @unique
   emailVerified DateTime?
   passwordHash  String
@@ -112,30 +109,16 @@ model Player {
   gameId String @db.Uuid
   game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
-  name    String
-  seat    Int
-  balance Int
-
-  nfcCard NfcCard?
+  name       String
+  seat       Int
+  balance    Int
+  nfcCardUid String
 
   outgoingTransactions Transaction[] @relation("FromPlayer")
   incomingTransactions Transaction[] @relation("ToPlayer")
 
-  @@unique([gameId, seat])
+  @@unique([gameId, nfcCardUid])
   @@index([gameId])
-}
-
-model NfcCard {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  uid String @unique
-
-  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  playerId String @unique @db.Uuid
-
-  @@index([uid])
 }
 
 model TransactionType {

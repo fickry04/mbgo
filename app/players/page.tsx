@@ -41,6 +41,7 @@ export default function PlayersPage() {
   const [seat, setSeat] = useState<number | undefined>(1);
   const [scanOpened, setScanOpened] = useState(false);
   const [pendingUid, setPendingUid] = useState<string | null>(null);
+  const [deletingPlayerId, setDeletingPlayerId] = useState<string | null>(null);
 
   const seatMax = game?.playersCount ?? 4;
 
@@ -79,6 +80,38 @@ export default function PlayersPage() {
         title: "Gagal",
         message: e instanceof Error ? e.message : "Gagal register player",
       });
+    }
+  }
+
+  async function deletePlayer(playerId: string, playerName: string) {
+    if (!game) {
+      notifications.show({ color: "red", title: "Tidak ada game", message: "Tidak ada game aktif." });
+      return;
+    }
+    if (game.status !== "ACTIVE") {
+      notifications.show({ color: "red", title: "Game selesai", message: "Tidak bisa hapus player." });
+      return;
+    }
+
+    const ok = window.confirm(`Hapus pemain "${playerName}"?`);
+    if (!ok) return;
+
+    try {
+      setDeletingPlayerId(playerId);
+      await fetchJson("/api/player/delete", {
+        method: "POST",
+        body: JSON.stringify({ playerId }),
+      });
+      notifications.show({ color: "green", title: "Berhasil", message: "Pemain terhapus." });
+      await qc.invalidateQueries({ queryKey: ["summary"] });
+    } catch (e) {
+      notifications.show({
+        color: "red",
+        title: "Gagal",
+        message: e instanceof Error ? e.message : "Gagal hapus player",
+      });
+    } finally {
+      setDeletingPlayerId(null);
     }
   }
 
@@ -129,6 +162,7 @@ export default function PlayersPage() {
             <Text fw={600} mb="sm">
               Daftar pemain
             </Text>
+            <div style={{ overflowX: 'auto'}}>
             <Table withTableBorder highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
@@ -136,6 +170,7 @@ export default function PlayersPage() {
                   <Table.Th>Nama</Table.Th>
                   <Table.Th>UID</Table.Th>
                   <Table.Th>Saldo</Table.Th>
+                  <Table.Th>Aksi</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -145,10 +180,25 @@ export default function PlayersPage() {
                     <Table.Td>{p.name}</Table.Td>
                     <Table.Td>{p.nfcCard?.uid ?? "-"}</Table.Td>
                     <Table.Td>{formatMoney(p.balance)}</Table.Td>
+                    <Table.Td>
+                      <Button
+                        size="xs"
+                        color="red"
+                        variant="light"
+                        loading={deletingPlayerId === p.id}
+                        disabled={!game || game.status !== "ACTIVE"}
+                        onClick={() => {
+                          void deletePlayer(p.id, p.name);
+                        }}
+                      >
+                        Hapus
+                      </Button>
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>
             </Table>
+            </div>
           </Card>
         </Grid.Col>
       </Grid>

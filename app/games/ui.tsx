@@ -29,8 +29,8 @@ type Game = {
 
 export function GameActions({ games }: { games: Game[] }) {
   const qc = useQueryClient();
-  const [playersCount, setPlayersCount] = useState<number | undefined>(4);
-  const [initialBalance, setInitialBalance] = useState<number | undefined>(1500);
+  const [playersCount, setPlayersCount] = useState<number | undefined>(2);
+  const [initialBalance, setInitialBalance] = useState<number | undefined>(150000);
 
   const active = games.find((g) => g.status === "ACTIVE") ?? null;
 
