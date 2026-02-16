@@ -3,6 +3,9 @@
 
 Digital bank untuk permainan Monopoly dengan kartu pemain NFC (NTAG215) menggunakan Web NFC.
 
+## Cobain nih
+https://mbgo.zeabur.app/
+
 ## Tech stack
 
 - Next.js (App Router)
