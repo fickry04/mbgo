@@ -22,7 +22,7 @@ import { notifyError, notifySuccess, notifyWarning } from "@/app/lib/notify";
 
 type SummaryResponse = {
   game: { id: string; status: "ACTIVE" | "ENDED"; playersCount: number; initialBalance: number } | null;
-  players: Array<{ id: string; name: string; seat: number; balance: number; nfcCard?: { uid: string } | null }>;
+  players: Array<{ id: string; name: string; seat: number; balance: number; nfcCardUid?: string }>;
   totalCirculation: number;
   transactions: unknown[];
 };
@@ -197,7 +197,7 @@ export default function PlayersPage() {
                       <Table.Tr key={p.id}>
                         <Table.Td>P{p.seat}</Table.Td>
                         <Table.Td>{p.name}</Table.Td>
-                        <Table.Td>{p.nfcCard?.uid ?? "-"}</Table.Td>
+                        <Table.Td>{p.nfcCardUid ?? "-"}</Table.Td>
                         <Table.Td>{formatMoney(p.balance)}</Table.Td>
                         <Table.Td>
                           <Button
