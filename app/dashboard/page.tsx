@@ -60,7 +60,7 @@ export default function DashboardPage() {
   async function createGame() {
     try {
       setCreating(true);
-      const body = { playersCount: 4, initialBalance: 1500 };
+      const body = { playersCount: 4, initialBalance: 150000 };
       await fetchJson<{ game: { id: string } }>("/api/game/create", {
         method: "POST",
         body: JSON.stringify(body),
