@@ -199,14 +199,23 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
       <Grid>
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Stack gap="xs">
-            <Stack gap={2}>
-              <Text size="sm" c="dimmed">
-                {selected
-                  ? `${selected.transactionType.label} • ${selected.direction}`
-                  : "Klik tombol untuk pilih transaksi"}
+            <Select
+                label="Properti"
+                data={propertyOptions}
+                value={propertyId}
+                onChange={(v) => {
+                  const nextPropertyId = v ?? GENERAL_VALUE;
+                  setPropertyId(nextPropertyId);
+                  setTemplateId(null);
+                  setAmount(undefined);
+                }}
+                searchable
+                nothingFoundMessage="Tidak ada"
+              />
+
+              <Text size="xs" c="dimmed">
+                Pilih cepat transaksi lewat kartu.
               </Text>
-              <Text size="sm">{selected?.description ?? "-"}</Text>
-            </Stack>
 
             {selectedProperty ? (
               <PropertyTemplateCard
@@ -342,23 +351,14 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Card withBorder radius="md" className="mbg-card">
             <Stack gap="sm">
-              <Select
-                label="Properti"
-                data={propertyOptions}
-                value={propertyId}
-                onChange={(v) => {
-                  const nextPropertyId = v ?? GENERAL_VALUE;
-                  setPropertyId(nextPropertyId);
-                  setTemplateId(null);
-                  setAmount(undefined);
-                }}
-                searchable
-                nothingFoundMessage="Tidak ada"
-              />
-
-              <Text size="xs" c="dimmed">
-                Pilih cepat transaksi lewat kartu.
-              </Text>
+              <Stack gap={2}>
+              <Text size="sm" c="dimmed">
+                {selected
+                  ? `${selected.transactionType.label} • ${selected.direction}`
+                  : "Klik tombol untuk pilih transaksi"}
+              </Text> 
+              <Text size="sm">{selected?.description ?? "-"}</Text>
+            </Stack>
 
               <NumberInput
                 label="Nominal"
