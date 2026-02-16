@@ -63,8 +63,31 @@ body {
   .mbg-enter,
   .mbg-enter-1,
   .mbg-enter-2,
-  .mbg-enter-3 {
+  .mbg-enter-3,
+  .mbg-dice-roll {
     animation: none !important;
+  }
+}
+
+.mbg-dice-roll {
+  animation: mbg-dice-roll 240ms ease-in-out infinite;
+}
+
+@keyframes mbg-dice-roll {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-2px) rotate(-6deg) scale(1.01);
+  }
+  50% {
+    transform: translateY(0) rotate(6deg) scale(1.02);
+  }
+  75% {
+    transform: translateY(-1px) rotate(-3deg) scale(1.01);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
   }
 }
 

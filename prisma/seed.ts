@@ -21,9 +21,9 @@ function envOrDefault(name: string, fallback: string) {
 }
 
 async function upsertAdminUser() {
-  const email = envOrDefault("ADMIN_EMAIL", "admin@example.com");
-  const legacyUsername = envOrDefault("ADMIN_USERNAME", "admin");
-  const password = envOrDefault("ADMIN_PASSWORD", "admin123");
+  const email = envOrDefault("TEST_EMAIL", "test@example.com");
+  const legacyUsername = envOrDefault("TEST_USERNAME", "test");
+  const password = envOrDefault("TEST_PASSWORD", "password123");
 
   const passwordHash = await bcrypt.hash(password, 12);
 
@@ -49,7 +49,7 @@ async function upsertAdminUser() {
   }
 
   // eslint-disable-next-line no-console
-  console.log(`Seeded admin user: ${email}`);
+  console.log(`Seeded test user: ${email}`);
 }
 
 async function upsertTransactionTypesAndTemplates() {
@@ -161,6 +161,13 @@ async function upsertTransactionTypesAndTemplates() {
 
   // Minimal, production-friendly templates (amounts are optional; can be overridden).
   const templates: TemplateSeed[] = [
+    {
+      name: "Lewat Start",
+      direction: TransactionDirection.CREDIT,
+      defaultAmount: 20000,
+      description: "Pemain melewati start.",
+      code: TransactionKind.BALANCE_UPDATE,
+    },
     {
       name: "Tambah saldo (Bank memberi)",
       direction: TransactionDirection.CREDIT,

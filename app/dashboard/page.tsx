@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Badge,
   Button,
   Card,
   Grid,
   Group,
+  Pagination,
   Skeleton,
   Select,
   Stack,
@@ -18,6 +20,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchJson } from "@/app/lib/http";
 import { formatMoney } from "@/app/lib/money";
 import { notifyError, notifySuccess } from "@/app/lib/notify";
+import { DiceRollFab } from "../components/DiceRollFab";
 
 type SummaryResponse = {
   game: { id: string; status: "ACTIVE" | "ENDED"; playersCount: number; initialBalance: number } | null;
@@ -33,24 +36,47 @@ type SummaryResponse = {
     fromPlayer: { name: string; seat: number } | null;
     toPlayer: { name: string; seat: number } | null;
   }>;
+  transactionsTotal: number;
+  page: number;
+  pageSize: number;
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const qc = useQueryClient();
   const [playerFilter, setPlayerFilter] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const [creating, setCreating] = useState(false);
   const [ending, setEnding] = useState(false);
 
+  useEffect(() => {
+    const tx = searchParams.get("tx");
+    if (tx === "success") {
+      notifySuccess("Sukses", "Transaksi tersimpan.");
+      router.replace("/dashboard");
+    }
+  }, [router, searchParams]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [playerFilter]);
+
   const { data, isLoading } = useQuery({
-    queryKey: ["summary", playerFilter],
+    queryKey: ["summary", playerFilter, page],
     queryFn: () =>
       fetchJson<SummaryResponse>(
-        `/api/dashboard/summary${playerFilter ? `?playerId=${playerFilter}` : ""}`
+        `/api/dashboard/summary?${new URLSearchParams({
+          ...(playerFilter ? { playerId: playerFilter } : {}),
+          page: String(page),
+        }).toString()}`
       ),
     refetchInterval: 1500,
   });
 
   const players = data?.players ?? [];
+  const pageSize = data?.pageSize ?? 10;
+  const totalPages = Math.max(1, Math.ceil((data?.transactionsTotal ?? 0) / pageSize));
 
   const playerOptions = useMemo(
     () => players.map((p) => ({ value: p.id, label: `P${p.seat} - ${p.name}` })),
@@ -95,6 +121,7 @@ export default function DashboardPage() {
   }
 
   return (
+    <>
     <Stack gap="md">
       <Group justify="space-between" align="flex-end">
         <Stack gap={2}>
@@ -106,6 +133,14 @@ export default function DashboardPage() {
           </Text>
         </Stack>
         <Group>
+          <Button
+            className="mbg-click"
+            variant="light"
+            onClick={() => router.push("/transactions")}
+            disabled={!data?.game}
+          >
+            Tambah Transaksi
+          </Button>
           {data?.game ? (
             <Button
               className="mbg-click"
@@ -240,9 +275,18 @@ export default function DashboardPage() {
                 ) : null}
               </Table.Tbody>
             </Table>
+
+            {!isLoading && (data?.transactionsTotal ?? 0) > 0 ? (
+              <Group justify="flex-end" mt="sm">
+                <Pagination value={page} onChange={setPage} total={totalPages} size="sm" />
+              </Group>
+            ) : null}
           </Card>
         </Grid.Col>
       </Grid>
     </Stack>
+    <DiceRollFab />
+    </>
   );
 }
+

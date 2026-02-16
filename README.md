@@ -15,7 +15,7 @@ https://mbgo.zeabur.app/
 - TanStack Query
 - Web NFC API (Chrome Android)
 
-## Setup
+## Setup Development
 
 ### 1) Install
 
@@ -62,8 +62,8 @@ npx prisma db seed --config ./prisma.config.ts
 
 Default login (bisa diubah via env `ADMIN_EMAIL`/`ADMIN_PASSWORD` sebelum seed):
 
-- email: `admin@example.com`
-- password: `admin123`
+- email: `test@example.com`
+- password: `password123`
 
 ### 5) Run
 
@@ -81,11 +81,3 @@ Buka http://localhost:3000
 	- Buat game (Dashboard / Games)
 	- Registrasi pemain + scan UID NFC (Players)
 	- Buat transaksi: scan pemain sumber, (opsional) scan tujuan, submit (Transactions)
-
-## API routes
-
-- `POST /api/game/create`
-- `POST /api/player/register`
-- `POST /api/nfc/scan`
-- `POST /api/transaction/create`
-- `GET /api/dashboard/summary`

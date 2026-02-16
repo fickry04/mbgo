@@ -1,9 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
-  Badge,
   Button,
   Card,
   Grid,
@@ -14,7 +13,6 @@ import {
   Text,
   TextInput,
   Title,
-  Transition,
 } from "@mantine/core";
 import type {
   PropertyTemplate,
@@ -26,7 +24,7 @@ import { NfcScanModal } from "@/app/components/NfcScanModal";
 import { PropertyTemplateCard } from "@/app/components/PropertyTemplateCard";
 import { fetchJson } from "@/app/lib/http";
 import type { PropertyTemplateCardData } from "@/app/lib/property-template";
-import { notifyError, notifySuccess, notifyWarning } from "@/app/lib/notify";
+import { notifyError, notifyWarning } from "@/app/lib/notify";
 
 type TemplateWithType = TransactionTemplate & {
   transactionType: TransactionType;
@@ -57,6 +55,7 @@ function toCardData(p: PropertyTemplate): PropertyTemplateCardData {
 }
 
 export function TransactionClient({ templates }: { templates: TemplateWithType[] }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const GENERAL_VALUE = "__general";
@@ -134,9 +133,14 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
   const [scanFromOpen, setScanFromOpen] = useState(false);
   const [scanToOpen, setScanToOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
-  const [success, setSuccess] = useState(false);
   const direction: TransactionDirection | null = selected?.direction ?? null;
+
+  function clearForm() {
+    setAmount(undefined);
+    setNote("");
+    setFromUid(null);
+    setToUid(null);
+  }
 
   async function submit() {
     if (!templateId) {
@@ -169,13 +173,7 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
         }),
       });
 
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 1200);
-      notifySuccess("Sukses", "Transaksi tersimpan.");
-
-      setFromUid(null);
-      setToUid(null);
-      setNote("");
+      router.push("/dashboard?tx=success");
     } catch (e) {
       notifyError("Gagal", e, "Gagal membuat transaksi");
     } finally {
@@ -187,13 +185,6 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
     <Stack gap="md">
       <Group justify="space-between">
         <Title order={2}>Transaksi</Title>
-        <Transition mounted={success} transition="fade" duration={200} timingFunction="ease">
-          {(styles) => (
-            <Badge style={styles} color="green" size="lg">
-              Transaksi berhasil
-            </Badge>
-          )}
-        </Transition>
       </Group>
 
       <Grid>
@@ -395,7 +386,16 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
                 </Group>
               ) : null}
 
-              <Group justify="flex-end" mt="sm">
+              <Group justify="space-between" mt="sm">
+                <Button
+                  className="mbg-click"
+                  variant="light"
+                  color="gray"
+                  onClick={clearForm}
+                  disabled={submitting}
+                >
+                  Clear
+                </Button>
                 <Button className="mbg-click" onClick={submit} loading={submitting}>
                   Submit
                 </Button>

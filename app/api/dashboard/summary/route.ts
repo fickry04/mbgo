@@ -10,6 +10,9 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const gameId = searchParams.get("gameId") ?? undefined;
   const playerId = searchParams.get("playerId") ?? undefined;
+  const pageRaw = searchParams.get("page");
+  const page = Math.max(1, Number(pageRaw ?? 1) || 1);
+  const pageSize = 10;
 
   const game = gameId
     ? await prisma.game.findFirst({
@@ -26,6 +29,9 @@ export async function GET(req: Request) {
       players: [],
       totalCirculation: 0,
       transactions: [],
+      transactionsTotal: 0,
+      page,
+      pageSize,
     });
   }
 
@@ -39,28 +45,37 @@ export async function GET(req: Request) {
     0
   );
 
-  const transactions = await prisma.transaction.findMany({
-    where: {
-      gameId: game.id,
-      ...(playerId
-        ? {
-            OR: [{ fromPlayerId: playerId }, { toPlayerId: playerId }],
-          }
-        : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-    include: {
-      transactionType: true,
-      fromPlayer: true,
-      toPlayer: true,
-    },
-  });
+  const transactionsWhere = {
+    gameId: game.id,
+    ...(playerId
+      ? {
+          OR: [{ fromPlayerId: playerId }, { toPlayerId: playerId }],
+        }
+      : {}),
+  } as const;
+
+  const [transactionsTotal, transactions] = await Promise.all([
+    prisma.transaction.count({ where: transactionsWhere }),
+    prisma.transaction.findMany({
+      where: transactionsWhere,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      include: {
+        transactionType: true,
+        fromPlayer: true,
+        toPlayer: true,
+      },
+    }),
+  ]);
 
   return NextResponse.json({
     game,
     players,
     totalCirculation,
     transactions,
+    transactionsTotal,
+    page,
+    pageSize,
   });
 }
