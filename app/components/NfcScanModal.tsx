@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Button, Group, Modal, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconNfc, IconX } from "@tabler/icons-react";
 import { useNfcScan } from "@/app/hooks/useNfcScan";
@@ -18,6 +18,59 @@ export function NfcScanModal({
 }) {
   const { supported, state, scanOnce, stop } = useNfcScan();
 
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  const primeAudio = useCallback(async () => {
+    if (typeof window === "undefined") return;
+    const AudioCtx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+
+    if (!audioCtxRef.current) audioCtxRef.current = new AudioCtx();
+    if (audioCtxRef.current.state === "suspended") {
+      try {
+        await audioCtxRef.current.resume();
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+
+  const playSuccessChime = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
+
+    try {
+      const now = ctx.currentTime;
+      const gain = ctx.createGain();
+
+      // Subtle, short envelope (not too loud, not too long)
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.035, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+      gain.connect(ctx.destination);
+
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.setValueAtTime(988, now + 0.09);
+      osc.connect(gain);
+
+      osc.onended = () => {
+        try {
+          osc.disconnect();
+          gain.disconnect();
+        } catch {
+          // ignore
+        }
+      };
+
+      osc.start(now);
+      osc.stop(now + 0.22);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const secureContext = useMemo(() => {
     return typeof window !== "undefined" && window.isSecureContext;
   }, []);
@@ -26,10 +79,15 @@ export function NfcScanModal({
     if (!opened) stop();
   }, [opened, stop]);
 
-  async function handleScan() {
+  const handleScan = useCallback(async () => {
+    // Prime audio context within the user gesture (click) so it can play on success.
+    await primeAudio();
     const uid = await scanOnce();
-    if (uid) onScanned(uid);
-  }
+    if (uid) {
+      playSuccessChime();
+      onScanned(uid);
+    }
+  }, [onScanned, playSuccessChime, primeAudio, scanOnce]);
 
   const statusText =
     state.status === "idle"
