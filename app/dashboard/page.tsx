@@ -92,7 +92,7 @@ export default function DashboardPage() {
         body: JSON.stringify(body),
       });
       notifySuccess("Game dibuat", "Game baru berhasil dibuat.");
-      await qc.invalidateQueries({ queryKey: ["summary"] });
+      router.push("/players");
     } catch (e) {
       notifyError("Gagal", e, "Gagal create game");
     } finally {

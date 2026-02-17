@@ -17,85 +17,7 @@ export function NfcScanModal({
   onScanned: (uid: string) => void;
 }) {
   const { supported, state, scanOnce, stop } = useNfcScan();
-
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const successBufferRef = useRef<AudioBuffer | null>(null);
-  const loadingSuccessBufferRef = useRef<Promise<AudioBuffer | null> | null>(null);
-
-  const ensureSuccessBufferLoaded = useCallback(async (): Promise<AudioBuffer | null> => {
-    const ctx = audioCtxRef.current;
-    if (!ctx) return null;
-    if (successBufferRef.current) return successBufferRef.current;
-    if (loadingSuccessBufferRef.current) return loadingSuccessBufferRef.current;
-
-    loadingSuccessBufferRef.current = (async () => {
-      try {
-        const res = await fetch("/applepay.mp3");
-        const buf = await res.arrayBuffer();
-        const audioBuffer = await ctx.decodeAudioData(buf.slice(0));
-        successBufferRef.current = audioBuffer;
-        return audioBuffer;
-      } catch {
-        return null;
-      } finally {
-        loadingSuccessBufferRef.current = null;
-      }
-    })();
-
-    return loadingSuccessBufferRef.current;
-  }, []);
-
-  const primeAudio = useCallback(async () => {
-    if (typeof window === "undefined") return;
-    const AudioCtx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-
-    if (!audioCtxRef.current) audioCtxRef.current = new AudioCtx();
-    if (audioCtxRef.current.state === "suspended") {
-      try {
-        await audioCtxRef.current.resume();
-      } catch {
-        // ignore
-      }
-    }
-
-    // Load & decode the success sound after context is available (still within user gesture).
-    await ensureSuccessBufferLoaded();
-  }, [ensureSuccessBufferLoaded]);
-
-  const playSuccessChime = useCallback(() => {
-    const ctx = audioCtxRef.current;
-    if (!ctx) return;
-
-    const buffer = successBufferRef.current;
-    if (!buffer) return;
-
-    try {
-      const now = ctx.currentTime;
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-
-      const gain = ctx.createGain();
-      // Keep it soft.
-      gain.gain.setValueAtTime(0.25, now);
-
-      source.connect(gain);
-      gain.connect(ctx.destination);
-
-      source.onended = () => {
-        try {
-          source.disconnect();
-          gain.disconnect();
-        } catch {
-          // ignore
-        }
-      };
-
-      source.start(now);
-    } catch {
-      // ignore
-    }
-  }, []);
+  const successAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const secureContext = useMemo(() => {
     return typeof window !== "undefined" && window.isSecureContext;
@@ -105,15 +27,30 @@ export function NfcScanModal({
     if (!opened) stop();
   }, [opened, stop]);
 
+  useEffect(() => {
+    successAudioRef.current = new Audio("/applepay.mp3");
+    successAudioRef.current.preload = "auto";
+    return () => {
+      successAudioRef.current?.pause();
+      successAudioRef.current = null;
+    };
+  }, []);
+
   const handleScan = useCallback(async () => {
-    // Prime audio context within the user gesture (click) so it can play on success.
-    await primeAudio();
     const uid = await scanOnce();
     if (uid) {
-      playSuccessChime();
+      const audio = successAudioRef.current;
+      if (audio) {
+        try {
+          audio.currentTime = 0;
+          void audio.play();
+        } catch {
+          // ignore autoplay / playback errors
+        }
+      }
       onScanned(uid);
     }
-  }, [onScanned, playSuccessChime, primeAudio, scanOnce]);
+  }, [onScanned, scanOnce]);
 
   const statusText =
     state.status === "idle"

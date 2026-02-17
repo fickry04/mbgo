@@ -21,6 +21,7 @@ export function DiceRollFab() {
 
   const intervalRef = useRef<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
+  const rollAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const clearTimers = useCallback(() => {
     if (intervalRef.current) window.clearInterval(intervalRef.current);
@@ -30,7 +31,11 @@ export function DiceRollFab() {
   }, []);
 
   useEffect(() => {
+    rollAudioRef.current = new Audio("/roll-dice.mp3");
+    rollAudioRef.current.preload = "auto";
     return () => {
+      rollAudioRef.current?.pause();
+      rollAudioRef.current = null;
       clearTimers();
     };
   }, [clearTimers]);
@@ -40,6 +45,16 @@ export function DiceRollFab() {
 
     clearTimers();
     setRolling(true);
+
+    const audio = rollAudioRef.current;
+    if (audio) {
+      try {
+        audio.currentTime = 0;
+        void audio.play();
+      } catch {
+        // ignore autoplay / playback errors
+      }
+    }
 
     intervalRef.current = window.setInterval(() => {
       setDie1(randomDie());

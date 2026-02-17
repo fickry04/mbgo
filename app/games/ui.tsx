@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Badge,
   Button,
@@ -29,6 +30,7 @@ type Game = {
 
 export function GameActions({ games }: { games: Game[] }) {
   const qc = useQueryClient();
+  const router = useRouter();
   const [playersCount, setPlayersCount] = useState<number | undefined>(2);
   const [initialBalance, setInitialBalance] = useState<number | undefined>(150000);
   const [creating, setCreating] = useState(false);
@@ -48,7 +50,7 @@ export function GameActions({ games }: { games: Game[] }) {
       });
       notifySuccess("OK", "Game dibuat.");
       await qc.invalidateQueries();
-      location.reload();
+      router.push("/players");
     } catch (e) {
       notifyError("Gagal", e, "Gagal");
     } finally {
