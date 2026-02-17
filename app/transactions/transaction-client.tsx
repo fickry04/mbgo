@@ -135,13 +135,6 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
   const [submitting, setSubmitting] = useState(false);
   const direction: TransactionDirection | null = selected?.direction ?? null;
 
-  function clearForm() {
-    setAmount(undefined);
-    setNote("");
-    setFromUid(null);
-    setToUid(null);
-  }
-
   async function submit() {
     if (!templateId) {
       notifyWarning("Template kosong", "Pilih transaksi.");
@@ -190,8 +183,9 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
       <Grid>
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Stack gap="xs">
+            <Text size="sm">Properti</Text>
+            <Group gap="sm" grow>
             <Select
-                label="Properti"
                 data={propertyOptions}
                 value={propertyId}
                 onChange={(v) => {
@@ -202,8 +196,9 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
                 }}
                 searchable
                 nothingFoundMessage="Tidak ada"
+                clearable
               />
-
+            </Group>
               <Text size="xs" c="dimmed">
                 Pilih cepat transaksi lewat kartu.
               </Text>
@@ -386,20 +381,9 @@ export function TransactionClient({ templates }: { templates: TemplateWithType[]
                 </Group>
               ) : null}
 
-              <Group justify="space-between" mt="sm">
-                <Button
-                  className="mbg-click"
-                  variant="light"
-                  color="gray"
-                  onClick={clearForm}
-                  disabled={submitting}
-                >
-                  Clear
-                </Button>
-                <Button className="mbg-click" onClick={submit} loading={submitting}>
-                  Submit
-                </Button>
-              </Group>
+              <Button className="mbg-click" onClick={submit} loading={submitting}>
+                Submit
+              </Button>
 
               <Text size="xs" c="dimmed">
                 Tip: Web NFC bekerja di Chrome Android.

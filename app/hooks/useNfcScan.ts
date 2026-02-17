@@ -20,10 +20,6 @@ function isSupported() {
   return typeof window !== "undefined" && "NDEFReader" in window;
 }
 
-function isSecureContext() {
-  return typeof window !== "undefined" && window.isSecureContext;
-}
-
 function isUserActivationActive() {
   if (typeof navigator === "undefined") return false;
   const ua = (navigator as unknown as { userActivation?: { isActive?: boolean } }).userActivation;
@@ -63,14 +59,6 @@ export function useNfcScan() {
   const scanOnce = useCallback(async () => {
     if (!supported) {
       setState({ status: "error", message: "Web NFC tidak didukung di device ini." });
-      return null;
-    }
-
-    if (!isSecureContext()) {
-      setState({
-        status: "error",
-        message: "Web NFC butuh HTTPS (atau localhost). Buka aplikasi via HTTPS lalu coba lagi.",
-      });
       return null;
     }
 
