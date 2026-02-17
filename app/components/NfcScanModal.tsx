@@ -19,6 +19,31 @@ export function NfcScanModal({
   const { supported, state, scanOnce, stop } = useNfcScan();
 
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const successBufferRef = useRef<AudioBuffer | null>(null);
+  const loadingSuccessBufferRef = useRef<Promise<AudioBuffer | null> | null>(null);
+
+  const ensureSuccessBufferLoaded = useCallback(async (): Promise<AudioBuffer | null> => {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return null;
+    if (successBufferRef.current) return successBufferRef.current;
+    if (loadingSuccessBufferRef.current) return loadingSuccessBufferRef.current;
+
+    loadingSuccessBufferRef.current = (async () => {
+      try {
+        const res = await fetch("/applepay.mp3");
+        const buf = await res.arrayBuffer();
+        const audioBuffer = await ctx.decodeAudioData(buf.slice(0));
+        successBufferRef.current = audioBuffer;
+        return audioBuffer;
+      } catch {
+        return null;
+      } finally {
+        loadingSuccessBufferRef.current = null;
+      }
+    })();
+
+    return loadingSuccessBufferRef.current;
+  }, []);
 
   const primeAudio = useCallback(async () => {
     if (typeof window === "undefined") return;
@@ -33,39 +58,40 @@ export function NfcScanModal({
         // ignore
       }
     }
-  }, []);
+
+    // Load & decode the success sound after context is available (still within user gesture).
+    await ensureSuccessBufferLoaded();
+  }, [ensureSuccessBufferLoaded]);
 
   const playSuccessChime = useCallback(() => {
     const ctx = audioCtxRef.current;
     if (!ctx) return;
 
+    const buffer = successBufferRef.current;
+    if (!buffer) return;
+
     try {
       const now = ctx.currentTime;
-      const gain = ctx.createGain();
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
 
-      // Subtle, short envelope (not too loud, not too long)
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.035, now + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+      const gain = ctx.createGain();
+      // Keep it soft.
+      gain.gain.setValueAtTime(0.25, now);
+
+      source.connect(gain);
       gain.connect(ctx.destination);
 
-      const osc = ctx.createOscillator();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(880, now);
-      osc.frequency.setValueAtTime(988, now + 0.09);
-      osc.connect(gain);
-
-      osc.onended = () => {
+      source.onended = () => {
         try {
-          osc.disconnect();
+          source.disconnect();
           gain.disconnect();
         } catch {
           // ignore
         }
       };
 
-      osc.start(now);
-      osc.stop(now + 0.22);
+      source.start(now);
     } catch {
       // ignore
     }
